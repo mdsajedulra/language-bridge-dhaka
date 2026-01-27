@@ -11,14 +11,18 @@
     "campus": "校园生活",
     "videos": "中文视频",
     "contact": "联系我们",
-    "enrollNow": "立即报名"
+    "enrollNow": "立即报名",
+    "books": "书籍"
   },
   "hero": {
     "tagline": "国家发展的语言伙伴",
     "subtitle": "通过优质的中文教育庆祝孟中友谊。加入数千名成功掌握普通话的学生行列。",
     "enrollNow": "立即报名",
     "viewCourses": "查看课程",
-    "contactUs": "联系我们"
+    "contactUs": "联系我们",
+    "students": "学生",
+    "teachers": "教师",
+    "years": "年"
   },
   "courses": {
     "title": "我们的课程",

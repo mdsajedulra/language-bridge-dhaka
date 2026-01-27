@@ -5,12 +5,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
 
 const Footer = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
+  const { getLocalizedField } = useLocalized();
 
-  const quickLinks = [
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*');
+      if (error) throw error;
+      return data?.reduce((acc, item) => {
+        acc[item.key] = item;
+        return acc;
+      }, {} as Record<string, typeof data[0]>);
+    },
+  });
+
+  const { data: navItems } = useQuery({
+    queryKey: ['nav-items'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('nav_items')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order')
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const quickLinks = navItems?.map((item) => ({
+    path: item.path,
+    label: getLocalizedField(item, 'label'),
+  })) || [
     { path: '/', label: t('nav.home') },
     { path: '/about', label: t('nav.about') },
     { path: '/courses', label: t('nav.courses') },
@@ -25,39 +60,80 @@ const Footer = () => {
     { icon: Youtube, href: '#', label: 'Youtube' },
   ];
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      toast.success('Thank you for subscribing!');
-      setEmail('');
+      try {
+        const { error } = await supabase
+          .from('newsletter_subscribers')
+          .insert({ email });
+
+        if (error) {
+          if (error.code === '23505') {
+            toast.info('You are already subscribed!');
+          } else {
+            throw error;
+          }
+        } else {
+          toast.success('Thank you for subscribing!');
+        }
+        setEmail('');
+      } catch (error) {
+        console.error('Error subscribing:', error);
+        toast.error('Failed to subscribe. Please try again.');
+      }
     }
   };
 
+  const siteName = siteSettings?.site_name 
+    ? getLocalizedField(siteSettings.site_name, 'value')
+    : 'Yidai Yilu';
+
+  const siteTagline = siteSettings?.site_tagline
+    ? getLocalizedField(siteSettings.site_tagline, 'value')
+    : '一带一路中文学院';
+
+  const footerDescription = siteSettings?.footer_description
+    ? getLocalizedField(siteSettings.footer_description, 'value')
+    : t('footer.description');
+
+  const address = siteSettings?.contact_address
+    ? getLocalizedField(siteSettings.contact_address, 'value')
+    : t('footer.address');
+
+  const phone = siteSettings?.contact_phone?.value_en || t('footer.phone');
+  const emailAddress = siteSettings?.contact_email?.value_en || t('footer.email');
+  const logoUrl = siteSettings?.logo?.image_url;
+
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-[#1A1A1A] text-white">
       {/* Main Footer */}
       <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-                易
-              </div>
+              {logoUrl ? (
+                <img src={logoUrl} alt={siteName} className="h-10 w-10 rounded-lg object-cover" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A6B4E] text-white font-bold text-lg">
+                  易
+                </div>
+              )}
               <div>
-                <span className="font-bold text-lg text-primary-foreground">Yidai Yilu</span>
-                <span className="block text-xs text-muted-foreground">一带一路中文学院</span>
+                <span className="font-bold text-lg text-[#0A6B4E]">{siteName}</span>
+                <span className="block text-xs text-gray-400">{siteTagline}</span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t('footer.description')}
+            <p className="text-sm text-gray-400 leading-relaxed">
+              {footerDescription}
             </p>
             <div className="flex space-x-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/20 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-gray-400 hover:bg-[#0A6B4E] hover:text-white transition-colors"
                   aria-label={social.label}
                 >
                   <social.icon className="h-5 w-5" />
@@ -74,7 +150,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-gray-400 hover:text-[#0A6B4E] transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -87,17 +163,17 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">{t('footer.contactInfo')}</h4>
             <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <MapPin className="h-5 w-5 shrink-0 text-primary" />
-                <span>{t('footer.address')}</span>
+              <li className="flex items-start gap-3 text-sm text-gray-400">
+                <MapPin className="h-5 w-5 shrink-0 text-[#0A6B4E]" />
+                <span>{address}</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Phone className="h-5 w-5 shrink-0 text-primary" />
-                <span>{t('footer.phone')}</span>
+              <li className="flex items-center gap-3 text-sm text-gray-400">
+                <Phone className="h-5 w-5 shrink-0 text-[#0A6B4E]" />
+                <span>{phone}</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Mail className="h-5 w-5 shrink-0 text-primary" />
-                <span>{t('footer.email')}</span>
+              <li className="flex items-center gap-3 text-sm text-gray-400">
+                <Mail className="h-5 w-5 shrink-0 text-[#0A6B4E]" />
+                <span>{emailAddress}</span>
               </li>
             </ul>
           </div>
@@ -105,7 +181,7 @@ const Footer = () => {
           {/* Newsletter */}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">{t('footer.newsletter')}</h4>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-400">
               {t('footer.newsletterDesc')}
             </p>
             <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -114,9 +190,9 @@ const Footer = () => {
                 placeholder={t('footer.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-muted/20 border-muted/30 text-background placeholder:text-muted-foreground"
+                className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
               />
-              <Button type="submit" size="icon" className="shrink-0 bg-primary hover:bg-primary/90">
+              <Button type="submit" size="icon" className="shrink-0 bg-[#0A6B4E] hover:bg-[#0A6B4E]/90">
                 <Send className="h-4 w-4" />
               </Button>
             </form>
@@ -125,8 +201,8 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-muted/20">
-        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+      <div className="border-t border-white/10">
+        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
           <p>{t('footer.copyright')}</p>
           <p>{t('footer.affiliatedWith')}</p>
         </div>

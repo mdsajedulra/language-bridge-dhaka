@@ -11,6 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { useLocalized } from '@/hooks/useLocalized';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
@@ -22,15 +25,37 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
-const contactInfo = [
-  { icon: MapPin, title: 'Address', value: 'House 123, Road 45, Dhanmondi, Dhaka-1205, Bangladesh' },
-  { icon: Phone, title: 'Phone', value: '+880 1234-567890' },
-  { icon: Mail, title: 'Email', value: 'info@yidaiyilu.edu.bd' },
-  { icon: Clock, title: 'Hours', value: 'Sun - Thu: 9:00 AM - 8:00 PM' },
-];
-
 const Contact = () => {
   const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
+
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*');
+      if (error) throw error;
+      return data?.reduce((acc, item) => {
+        acc[item.key] = item;
+        return acc;
+      }, {} as Record<string, typeof data[0]>);
+    },
+  });
+
+  const address = siteSettings?.contact_address
+    ? getLocalizedField(siteSettings.contact_address, 'value')
+    : 'House 123, Road 45, Dhanmondi, Dhaka-1205, Bangladesh';
+
+  const phone = siteSettings?.contact_phone?.value_en || '+880 1234-567890';
+  const email = siteSettings?.contact_email?.value_en || 'info@yidaiyilu.edu.bd';
+
+  const contactInfo = [
+    { icon: MapPin, title: 'Address', value: address },
+    { icon: Phone, title: 'Phone', value: phone },
+    { icon: Mail, title: 'Email', value: email },
+    { icon: Clock, title: 'Hours', value: 'Sun - Thu: 9:00 AM - 8:00 PM' },
+  ];
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -43,10 +68,26 @@ const Contact = () => {
     },
   });
 
-  const onSubmit = (data: ContactFormData) => {
-    console.log('Contact form submitted:', data);
-    toast.success('Message sent successfully! We will get back to you soon.');
-    form.reset();
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          subject: data.subject,
+          message: data.message,
+        });
+
+      if (error) throw error;
+
+      toast.success('Message sent successfully! We will get back to you soon.');
+      form.reset();
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast.error('Failed to send message. Please try again.');
+    }
   };
 
   return (

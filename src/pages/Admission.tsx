@@ -12,13 +12,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckCircle, FileText, CreditCard, GraduationCap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { useLocalized } from '@/hooks/useLocalized';
 
 const admissionSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
   email: z.string().email('Invalid email address').max(255),
   phone: z.string().min(10, 'Phone number must be at least 10 digits').max(20),
-  course: z.string().min(1, 'Please select a course'),
-  education: z.string().min(1, 'Please select your education level'),
+  course: z.string().optional(),
+  education: z.string().optional(),
   message: z.string().max(500).optional(),
 });
 
@@ -33,6 +36,20 @@ const steps = [
 
 const Admission = () => {
   const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
+
+  const { data: courses } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data;
+    },
+  });
   
   const form = useForm<AdmissionFormData>({
     resolver: zodResolver(admissionSchema),
@@ -46,10 +63,27 @@ const Admission = () => {
     },
   });
 
-  const onSubmit = (data: AdmissionFormData) => {
-    console.log('Admission form submitted:', data);
-    toast.success('Application submitted successfully! We will contact you soon.');
-    form.reset();
+  const onSubmit = async (data: AdmissionFormData) => {
+    try {
+      const { error } = await supabase
+        .from('admission_applications')
+        .insert({
+          full_name: data.name,
+          email: data.email,
+          phone: data.phone,
+          course_id: data.course || null,
+          education_level: data.education || null,
+          additional_notes: data.message || null,
+        });
+
+      if (error) throw error;
+
+      toast.success('Application submitted successfully! We will contact you soon.');
+      form.reset();
+    } catch (error) {
+      console.error('Error submitting admission form:', error);
+      toast.error('Failed to submit application. Please try again.');
+    }
   };
 
   return (
@@ -175,12 +209,20 @@ const Admission = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="communicative">Communicative Chinese Course</SelectItem>
-                              <SelectItem value="hsk4">HSK-4 Preparation Course</SelectItem>
-                              <SelectItem value="crazy">Crazy Chinese Course</SelectItem>
-                              <SelectItem value="evening">Evening Chinese Course</SelectItem>
-                              <SelectItem value="online">Online Chinese Course</SelectItem>
-                              <SelectItem value="children">Children's Chinese Course</SelectItem>
+                              {courses?.map((course) => (
+                                <SelectItem key={course.id} value={course.id}>
+                                  {getLocalizedField(course, 'title')}
+                                </SelectItem>
+                              )) || (
+                                <>
+                                  <SelectItem value="communicative">Communicative Chinese Course</SelectItem>
+                                  <SelectItem value="hsk4">HSK-4 Preparation Course</SelectItem>
+                                  <SelectItem value="crazy">Crazy Chinese Course</SelectItem>
+                                  <SelectItem value="evening">Evening Chinese Course</SelectItem>
+                                  <SelectItem value="online">Online Chinese Course</SelectItem>
+                                  <SelectItem value="children">Children's Chinese Course</SelectItem>
+                                </>
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
