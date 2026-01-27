@@ -23,6 +23,9 @@ interface Course {
   duration_en: string | null;
   duration_bn: string | null;
   duration_zh: string | null;
+  features_en: string[] | null;
+  features_bn: string[] | null;
+  features_zh: string[] | null;
   icon: string | null;
   image_url: string | null;
   price: number | null;
@@ -41,6 +44,9 @@ const defaultCourse: Partial<Course> = {
   duration_en: '',
   duration_bn: '',
   duration_zh: '',
+  features_en: [],
+  features_bn: [],
+  features_zh: [],
   icon: 'BookOpen',
   image_url: '',
   price: null,
@@ -79,6 +85,9 @@ const CoursesAdmin = () => {
         duration_en: data.duration_en || null,
         duration_bn: data.duration_bn || null,
         duration_zh: data.duration_zh || null,
+        features_en: data.features_en || [],
+        features_bn: data.features_bn || [],
+        features_zh: data.features_zh || [],
         icon: data.icon || 'BookOpen',
         image_url: data.image_url || null,
         price: data.price || null,
@@ -277,6 +286,50 @@ const CoursesAdmin = () => {
                       onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                       placeholder="https://..."
                     />
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="border-t pt-4 mt-4">
+                  <Label className="text-lg font-semibold">Course Features (one per line)</Label>
+                  <p className="text-sm text-muted-foreground mb-4">Add features/benefits for this course. Each line will be a bullet point.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label>Features (English)</Label>
+                      <Textarea
+                        value={(formData.features_en || []).join('\n')}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          features_en: e.target.value.split('\n').filter(f => f.trim()) 
+                        })}
+                        rows={5}
+                        placeholder="Expert native Chinese teachers&#10;Comprehensive study materials&#10;Certificate upon completion"
+                      />
+                    </div>
+                    <div>
+                      <Label>Features (বাংলা)</Label>
+                      <Textarea
+                        value={(formData.features_bn || []).join('\n')}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          features_bn: e.target.value.split('\n').filter(f => f.trim()) 
+                        })}
+                        rows={5}
+                        placeholder="বিশেষজ্ঞ চাইনিজ শিক্ষক&#10;সম্পূর্ণ স্টাডি ম্যাটেরিয়াল&#10;সার্টিফিকেট প্রদান"
+                      />
+                    </div>
+                    <div>
+                      <Label>Features (中文)</Label>
+                      <Textarea
+                        value={(formData.features_zh || []).join('\n')}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          features_zh: e.target.value.split('\n').filter(f => f.trim()) 
+                        })}
+                        rows={5}
+                        placeholder="专业中文教师&#10;全面的学习材料&#10;结业证书"
+                      />
+                    </div>
                   </div>
                 </div>
 

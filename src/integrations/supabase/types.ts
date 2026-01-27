@@ -211,6 +211,9 @@ export type Database = {
           duration_bn: string | null
           duration_en: string | null
           duration_zh: string | null
+          features_bn: string[] | null
+          features_en: string[] | null
+          features_zh: string[] | null
           icon: string | null
           id: string
           image_url: string | null
@@ -231,6 +234,9 @@ export type Database = {
           duration_bn?: string | null
           duration_en?: string | null
           duration_zh?: string | null
+          features_bn?: string[] | null
+          features_en?: string[] | null
+          features_zh?: string[] | null
           icon?: string | null
           id?: string
           image_url?: string | null
@@ -251,6 +257,9 @@ export type Database = {
           duration_bn?: string | null
           duration_en?: string | null
           duration_zh?: string | null
+          features_bn?: string[] | null
+          features_en?: string[] | null
+          features_zh?: string[] | null
           icon?: string | null
           id?: string
           image_url?: string | null

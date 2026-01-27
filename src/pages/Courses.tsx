@@ -22,7 +22,7 @@ const iconMap: Record<string, LucideIcon> = {
 
 const Courses = () => {
   const { t } = useTranslation();
-  const { getLocalizedField } = useLocalized();
+  const { getLocalizedField, getLocalizedArray } = useLocalized();
 
   const { data: courses, isLoading } = useQuery({
     queryKey: ['courses-all'],
@@ -99,12 +99,19 @@ const Courses = () => {
                             <span>{getLocalizedField(course, 'duration') || 'Flexible'}</span>
                           </div>
                         </div>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                          <li>• Expert native Chinese teachers</li>
-                          <li>• Comprehensive study materials</li>
-                          <li>• Certificate upon completion</li>
-                          <li>• Job placement support</li>
-                        </ul>
+                        {(() => {
+                          const features = getLocalizedArray(course, 'features');
+                          if (features && features.length > 0) {
+                            return (
+                              <ul className="space-y-2 text-sm text-muted-foreground">
+                                {features.map((feature, idx) => (
+                                  <li key={idx}>• {feature}</li>
+                                ))}
+                              </ul>
+                            );
+                          }
+                          return null;
+                        })()}
                       </CardContent>
                       <CardFooter>
                         <Button asChild className="w-full bg-primary hover:bg-primary/90">
