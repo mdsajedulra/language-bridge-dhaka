@@ -88,9 +88,10 @@ const Courses = () => {
                           </Badge>
                         )}
                         <CardTitle className="text-2xl">{getLocalizedField(course, 'title')}</CardTitle>
-                        <CardDescription className="text-muted-foreground text-base">
-                          {getLocalizedField(course, 'description')}
-                        </CardDescription>
+                        <div 
+                          className="text-muted-foreground text-base prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_p]:my-1"
+                          dangerouslySetInnerHTML={{ __html: getLocalizedField(course, 'description') || '' }}
+                        />
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="flex items-center gap-4 text-sm">
