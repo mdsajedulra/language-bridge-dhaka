@@ -95,9 +95,10 @@ const CoursesSection = () => {
                       )}
                     </div>
                     <CardTitle className="text-xl">{getLocalizedField(course, 'title')}</CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                      {getLocalizedField(course, 'description')}
-                    </CardDescription>
+                    <div 
+                      className="text-muted-foreground text-sm prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_p]:my-1 line-clamp-3"
+                      dangerouslySetInnerHTML={{ __html: getLocalizedField(course, 'description') || '' }}
+                    />
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
