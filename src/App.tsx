@@ -1,9 +1,11 @@
+import React from 'react';
 import '@/i18n/config';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from '@/contexts/AuthContext';
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Courses from "./pages/Courses";
@@ -16,33 +18,55 @@ import Campus from "./pages/Campus";
 import Videos from "./pages/Videos";
 import Contact from "./pages/Contact";
 import Books from "./pages/Books";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/admin/Dashboard";
+import CoursesAdmin from "./pages/admin/CoursesAdmin";
+import SettingsAdmin from "./pages/admin/SettingsAdmin";
+import ContactsAdmin from "./pages/admin/ContactsAdmin";
+import ApplicationsAdmin from "./pages/admin/ApplicationsAdmin";
+import NavigationAdmin from "./pages/admin/NavigationAdmin";
+import HeroAdmin from "./pages/admin/HeroAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/admission" element={<Admission />} />
-          <Route path="/notice" element={<Notice />} />
-          <Route path="/job" element={<Job />} />
-          <Route path="/alumni" element={<Alumni />} />
-          <Route path="/hsk" element={<HSK />} />
-          <Route path="/campus" element={<Campus />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/books" element={<Books />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/admission" element={<Admission />} />
+            <Route path="/notice" element={<Notice />} />
+            <Route path="/job" element={<Job />} />
+            <Route path="/alumni" element={<Alumni />} />
+            <Route path="/hsk" element={<HSK />} />
+            <Route path="/campus" element={<Campus />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/books" element={<Books />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/courses" element={<CoursesAdmin />} />
+            <Route path="/admin/settings" element={<SettingsAdmin />} />
+            <Route path="/admin/contacts" element={<ContactsAdmin />} />
+            <Route path="/admin/applications" element={<ApplicationsAdmin />} />
+            <Route path="/admin/navigation" element={<NavigationAdmin />} />
+            <Route path="/admin/hero" element={<HeroAdmin />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
