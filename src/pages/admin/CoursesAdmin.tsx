@@ -5,6 +5,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -208,29 +209,26 @@ const CoursesAdmin = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-4">
                   <div>
                     <Label>Description (English)</Label>
-                    <Textarea
+                    <RichTextEditor
                       value={formData.description_en || ''}
-                      onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                      rows={3}
+                      onChange={(value) => setFormData({ ...formData, description_en: value })}
                     />
                   </div>
                   <div>
                     <Label>Description (বাংলা)</Label>
-                    <Textarea
+                    <RichTextEditor
                       value={formData.description_bn || ''}
-                      onChange={(e) => setFormData({ ...formData, description_bn: e.target.value })}
-                      rows={3}
+                      onChange={(value) => setFormData({ ...formData, description_bn: value })}
                     />
                   </div>
                   <div>
                     <Label>Description (中文)</Label>
-                    <Textarea
+                    <RichTextEditor
                       value={formData.description_zh || ''}
-                      onChange={(e) => setFormData({ ...formData, description_zh: e.target.value })}
-                      rows={3}
+                      onChange={(value) => setFormData({ ...formData, description_zh: value })}
                     />
                   </div>
                 </div>
