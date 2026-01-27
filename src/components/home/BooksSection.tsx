@@ -4,52 +4,50 @@ import { motion } from 'framer-motion';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-const books = [
-  {
-    id: 1,
-    title: 'Basic Chinese for Beginners',
-    titleBn: 'শিক্ষানবিসদের জন্য বেসিক চাইনিজ',
-    titleZh: '初级汉语基础',
-    description: 'A comprehensive guide for starting your Chinese language journey with essential vocabulary and grammar.',
-    cover: '📕',
-  },
-  {
-    id: 2,
-    title: 'HSK Vocabulary Guide',
-    titleBn: 'এইচএসকে শব্দভাণ্ডার গাইড',
-    titleZh: 'HSK词汇指南',
-    description: 'Complete vocabulary lists for HSK levels 1-4 with examples and practice exercises.',
-    cover: '📗',
-  },
-  {
-    id: 3,
-    title: 'Chinese Characters Workbook',
-    titleBn: 'চাইনিজ অক্ষর ওয়ার্কবুক',
-    titleZh: '汉字练习册',
-    description: 'Practice writing Chinese characters with stroke order guides and worksheets.',
-    cover: '📘',
-  },
-  {
-    id: 4,
-    title: 'Business Chinese',
-    titleBn: 'বিজনেস চাইনিজ',
-    titleZh: '商务汉语',
-    description: 'Professional Chinese language skills for business communication and workplace scenarios.',
-    cover: '📙',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const BooksSection = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
 
-  const getLocalizedTitle = (book: typeof books[0]) => {
-    switch (i18n.language) {
-      case 'bn': return book.titleBn;
-      case 'zh': return book.titleZh;
-      default: return book.title;
-    }
-  };
+  const { data: books, isLoading } = useQuery({
+    queryKey: ['books-featured'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('books')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order')
+        .limit(4);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-secondary">
+        <div className="container">
+          <div className="text-center mb-12">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-64 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!books || books.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-secondary">
@@ -79,13 +77,27 @@ const BooksSection = () => {
             >
               <Card className="h-full hover:shadow-lg transition-all hover:-translate-y-1 group cursor-pointer">
                 <CardHeader className="text-center pb-2">
-                  <div className="text-6xl mb-4">{book.cover}</div>
-                  <CardTitle className="text-lg">{getLocalizedTitle(book)}</CardTitle>
+                  {book.cover_image_url ? (
+                    <img 
+                      src={book.cover_image_url} 
+                      alt={getLocalizedField(book, 'title')}
+                      className="h-40 w-auto mx-auto mb-4 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="text-6xl mb-4">📚</div>
+                  )}
+                  <CardTitle className="text-lg">{getLocalizedField(book, 'title')}</CardTitle>
+                  {book.author && (
+                    <p className="text-sm text-muted-foreground">{book.author}</p>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-muted-foreground text-center">
-                    {book.description}
+                  <CardDescription className="text-muted-foreground text-center line-clamp-2">
+                    {getLocalizedField(book, 'description')}
                   </CardDescription>
+                  {book.price && (
+                    <p className="text-primary font-semibold text-center mt-2">৳{book.price}</p>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -99,7 +111,7 @@ const BooksSection = () => {
           className="text-center mt-12"
         >
           <Button asChild variant="outline" size="lg">
-            <Link to="/courses">
+            <Link to="/books">
               <BookOpen className="mr-2 h-5 w-5" />
               {t('books.viewAll')}
             </Link>

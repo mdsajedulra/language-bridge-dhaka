@@ -1,61 +1,48 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-
-const partners = [
-  {
-    id: 1,
-    name: 'RZ (Canton) Education Technology Company Limited',
-    nameBn: 'আরজেড (ক্যান্টন) এডুকেশন টেকনোলজি কোম্পানি লিমিটেড',
-    nameZh: 'RZ（广州）教育科技有限公司',
-    logo: '🏢',
-  },
-  {
-    id: 2,
-    name: 'Hainan College of Economics and Business',
-    nameBn: 'হাইনান কলেজ অফ ইকোনমিক্স অ্যান্ড বিজনেস',
-    nameZh: '海南经贸职业技术学院',
-    logo: '🎓',
-  },
-  {
-    id: 3,
-    name: 'Confucius Institute',
-    nameBn: 'কনফুসিয়াস ইনস্টিটিউট',
-    nameZh: '孔子学院',
-    logo: '🏛️',
-  },
-  {
-    id: 4,
-    name: 'China Education Association',
-    nameBn: 'চায়না এডুকেশন অ্যাসোসিয়েশন',
-    nameZh: '中国教育协会',
-    logo: '📚',
-  },
-  {
-    id: 5,
-    name: 'Bangladesh-China Chamber of Commerce',
-    nameBn: 'বাংলাদেশ-চীন চেম্বার অফ কমার্স',
-    nameZh: '孟中商会',
-    logo: '🤝',
-  },
-  {
-    id: 6,
-    name: 'Dhaka University Chinese Department',
-    nameBn: 'ঢাকা বিশ্ববিদ্যালয় চীনা বিভাগ',
-    nameZh: '达卡大学中文系',
-    logo: '🎓',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const PartnersSection = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
 
-  const getLocalizedName = (partner: typeof partners[0]) => {
-    switch (i18n.language) {
-      case 'bn': return partner.nameBn;
-      case 'zh': return partner.nameZh;
-      default: return partner.name;
-    }
-  };
+  const { data: partners, isLoading } = useQuery({
+    queryKey: ['partners'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-secondary">
+        <div className="container">
+          <div className="text-center mb-12">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-32 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!partners || partners.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-secondary">
@@ -83,12 +70,21 @@ const PartnersSection = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               className="bg-background rounded-xl p-6 text-center hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer group"
+              onClick={() => partner.website_url && window.open(partner.website_url, '_blank')}
             >
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
-                {partner.logo}
-              </div>
+              {partner.logo_url ? (
+                <img 
+                  src={partner.logo_url} 
+                  alt={partner.name}
+                  className="h-16 w-auto mx-auto mb-4 object-contain group-hover:scale-110 transition-transform"
+                />
+              ) : (
+                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
+                  🏢
+                </div>
+              )}
               <p className="text-xs text-muted-foreground line-clamp-2">
-                {getLocalizedName(partner)}
+                {partner.name}
               </p>
             </motion.div>
           ))}

@@ -1,24 +1,60 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, Users, ArrowRight, BookOpen, Laptop, Moon, Zap, Baby, Award } from 'lucide-react';
+import { Clock, ArrowRight, BookOpen, Laptop, Moon, Zap, Baby, Award, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const courseIcons = {
-  communicative: BookOpen,
-  hsk4: Award,
-  crazy: Zap,
-  evening: Moon,
-  online: Laptop,
-  children: Baby,
+const iconMap: Record<string, LucideIcon> = {
+  BookOpen,
+  Award,
+  Zap,
+  Moon,
+  Laptop,
+  Baby,
 };
-
-const courses = ['communicative', 'hsk4', 'crazy', 'evening', 'online', 'children'] as const;
 
 const CoursesSection = () => {
   const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
+
+  const { data: courses, isLoading } = useQuery({
+    queryKey: ['courses-featured'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('sort_order')
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-secondary">
+        <div className="container">
+          <div className="text-center mb-12">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-64 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-secondary">
@@ -38,11 +74,11 @@ const CoursesSection = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => {
-            const Icon = courseIcons[course];
+          {courses?.map((course, index) => {
+            const Icon = iconMap[course.icon || 'BookOpen'] || BookOpen;
             return (
               <motion.div
-                key={course}
+                key={course.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -54,24 +90,26 @@ const CoursesSection = () => {
                       <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                         <Icon className="h-6 w-6" />
                       </div>
-                      <Badge variant="secondary">{t(`courses.${course}.level`)}</Badge>
+                      {course.price && (
+                        <Badge variant="secondary">৳{course.price}</Badge>
+                      )}
                     </div>
-                    <CardTitle className="text-xl">{t(`courses.${course}.title`)}</CardTitle>
+                    <CardTitle className="text-xl">{getLocalizedField(course, 'title')}</CardTitle>
                     <CardDescription className="text-muted-foreground">
-                      {t(`courses.${course}.description`)}
+                      {getLocalizedField(course, 'description')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {t(`courses.${course}.duration`)}
+                        {getLocalizedField(course, 'duration') || 'Flexible'}
                       </div>
                     </div>
                   </CardContent>
                   <CardFooter>
                     <Button asChild variant="ghost" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                      <Link to={`/courses#${course}`}>
+                      <Link to={`/courses#${course.id}`}>
                         {t('courses.learnMore')}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
