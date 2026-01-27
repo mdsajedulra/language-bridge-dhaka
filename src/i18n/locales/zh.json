@@ -1,0 +1,174 @@
+{
+  "nav": {
+    "home": "首页",
+    "about": "关于我们",
+    "courses": "课程",
+    "admission": "招生",
+    "notice": "通知",
+    "job": "招聘",
+    "alumni": "校友",
+    "hsk": "HSK考试",
+    "campus": "校园生活",
+    "videos": "中文视频",
+    "contact": "联系我们",
+    "enrollNow": "立即报名"
+  },
+  "hero": {
+    "tagline": "国家发展的语言伙伴",
+    "subtitle": "通过优质的中文教育庆祝孟中友谊。加入数千名成功掌握普通话的学生行列。",
+    "enrollNow": "立即报名",
+    "viewCourses": "查看课程",
+    "contactUs": "联系我们"
+  },
+  "courses": {
+    "title": "我们的课程",
+    "subtitle": "为各级水平和目标设计的综合中文语言课程",
+    "learnMore": "了解更多",
+    "communicative": {
+      "title": "交际中文课程",
+      "description": "掌握日常中文会话的实用口语技能。非常适合想要自信交流的初学者。",
+      "duration": "6个月",
+      "level": "初级到中级"
+    },
+    "hsk4": {
+      "title": "HSK-4备考课程",
+      "description": "HSK四级认证的强化备考。涵盖所有必需的词汇、语法和考试策略。",
+      "duration": "4个月",
+      "level": "中级"
+    },
+    "crazy": {
+      "title": "疯狂中文课程",
+      "description": "快速获得成果的加速沉浸式学习。非常适合希望快速进步的积极学习者。",
+      "duration": "3个月",
+      "level": "所有级别"
+    },
+    "evening": {
+      "title": "晚间中文课程",
+      "description": "为在职专业人士提供灵活的晚间课程。在不影响工作安排的情况下学习中文。",
+      "duration": "8个月",
+      "level": "所有级别"
+    },
+    "online": {
+      "title": "在线中文课程",
+      "description": "通过我们的互动在线平台随时随地学习。与经验丰富的教师进行现场直播课程。",
+      "duration": "灵活",
+      "level": "所有级别"
+    },
+    "children": {
+      "title": "儿童中文课程",
+      "description": "为6-15岁的年轻学习者设计的有趣且引人入胜的中文课程。游戏、歌曲和互动活动。",
+      "duration": "12个月",
+      "level": "初级"
+    }
+  },
+  "about": {
+    "title": "关于我们",
+    "subtitle": "通过语言教育架起孟中两国之间的桥梁",
+    "description": "一带一路中文学院成立于2016年1月1日，一直处于孟加拉国中文教育的前沿。我们很荣幸能够隶属于孟加拉国技术教育委员会（隶属编号50803）。",
+    "mission": "我们的使命是通过提供世界一流的中文教育来促进孟加拉国和中国之间的文化交流和经济合作。随着一带一路倡议加强两国之间的联系，对中文技能的需求持续增长。",
+    "stats": {
+      "students": "5000+",
+      "studentsLabel": "培训学生",
+      "teachers": "25+",
+      "teachersLabel": "专业教师",
+      "years": "9+",
+      "yearsLabel": "年经验",
+      "success": "95%",
+      "successLabel": "成功率"
+    },
+    "readMore": "阅读更多"
+  },
+  "services": {
+    "title": "我们的服务",
+    "subtitle": "为您的中文学习之旅提供全面支持",
+    "teaching": {
+      "title": "语言教学",
+      "description": "从初级到高级的专业中文语言课程"
+    },
+    "placement": {
+      "title": "就业安置",
+      "description": "中文职位的职业援助和就业安置服务"
+    },
+    "abroad": {
+      "title": "留学服务",
+      "description": "赴华留学的奖学金指导和支持"
+    },
+    "hsk": {
+      "title": "HSK备考",
+      "description": "全面的HSK考试备考和报名支持"
+    },
+    "internship": {
+      "title": "实习支持",
+      "description": "在孟加拉国中资企业的实习机会"
+    },
+    "translation": {
+      "title": "翻译服务",
+      "description": "专业的口译和文件翻译服务"
+    },
+    "tour": {
+      "title": "导游培训",
+      "description": "旅游行业的导游培训和援助"
+    }
+  },
+  "books": {
+    "title": "我们的教材",
+    "subtitle": "由我们的专家团队开发的综合学习材料",
+    "viewAll": "查看所有教材"
+  },
+  "testimonials": {
+    "title": "学生感言",
+    "subtitle": "听听我们成功学生关于他们学习历程的分享"
+  },
+  "media": {
+    "title": "媒体报道",
+    "subtitle": "我们学院成就的新闻报道和认可",
+    "readArticle": "阅读文章"
+  },
+  "partners": {
+    "title": "合作伙伴",
+    "subtitle": "与全球领先教育机构的合作"
+  },
+  "gallery": {
+    "title": "图片库",
+    "subtitle": "校园生活、活动和学生活动的精彩瞬间",
+    "viewAll": "查看所有图片",
+    "categories": {
+      "all": "全部",
+      "classroom": "教室",
+      "students": "学生",
+      "events": "活动",
+      "campus": "校园"
+    }
+  },
+  "footer": {
+    "description": "一带一路中文学院是孟加拉国领先的中文教育中心，致力于通过优质教育促进孟中友谊。",
+    "quickLinks": "快速链接",
+    "contactInfo": "联系信息",
+    "newsletter": "通讯订阅",
+    "newsletterDesc": "订阅以获取课程和活动更新",
+    "subscribe": "订阅",
+    "emailPlaceholder": "输入您的邮箱",
+    "address": "孟加拉国达卡-1205 达蒙迪 45路 123号",
+    "phone": "+880 1234-567890",
+    "email": "info@yidaiyilu.edu.bd",
+    "copyright": "© 2024 一带一路中文学院。保留所有权利。",
+    "affiliatedWith": "隶属于孟加拉国技术教育委员会（编号50803）"
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "如有任何咨询请与我们联系",
+    "form": {
+      "name": "您的姓名",
+      "email": "您的邮箱",
+      "phone": "电话号码",
+      "subject": "主题",
+      "message": "您的留言",
+      "submit": "发送消息"
+    }
+  },
+  "language": {
+    "en": "English",
+    "bn": "বাংলা",
+    "zh": "中文"
+  }
+}
