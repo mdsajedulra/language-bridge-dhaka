@@ -15,6 +15,7 @@ import HSK from "./pages/HSK";
 import Campus from "./pages/Campus";
 import Videos from "./pages/Videos";
 import Contact from "./pages/Contact";
+import Books from "./pages/Books";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/campus" element={<Campus />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/books" element={<Books />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -11,14 +11,18 @@
     "campus": "Campus Life",
     "videos": "Chinese Video",
     "contact": "Contact Us",
-    "enrollNow": "Enroll Now"
+    "enrollNow": "Enroll Now",
+    "books": "Books"
   },
   "hero": {
     "tagline": "Language Partner of National Development",
     "subtitle": "Celebrating Bangladesh-China friendship through quality Chinese language education. Join thousands of successful students who have mastered Mandarin with us.",
     "enrollNow": "Enroll Now",
     "viewCourses": "View Courses",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "students": "Students",
+    "teachers": "Teachers",
+    "years": "Years"
   },
   "courses": {
     "title": "Our Courses",
