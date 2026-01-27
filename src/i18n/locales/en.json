@@ -1,0 +1,174 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "courses": "Courses",
+    "admission": "Admission",
+    "notice": "Notice",
+    "job": "Job",
+    "alumni": "Alumni",
+    "hsk": "HSK Exam",
+    "campus": "Campus Life",
+    "videos": "Chinese Video",
+    "contact": "Contact Us",
+    "enrollNow": "Enroll Now"
+  },
+  "hero": {
+    "tagline": "Language Partner of National Development",
+    "subtitle": "Celebrating Bangladesh-China friendship through quality Chinese language education. Join thousands of successful students who have mastered Mandarin with us.",
+    "enrollNow": "Enroll Now",
+    "viewCourses": "View Courses",
+    "contactUs": "Contact Us"
+  },
+  "courses": {
+    "title": "Our Courses",
+    "subtitle": "Comprehensive Chinese language programs designed for all levels and goals",
+    "learnMore": "Learn More",
+    "communicative": {
+      "title": "Communicative Chinese Course",
+      "description": "Master everyday Chinese conversation with practical speaking skills. Perfect for beginners wanting to communicate confidently.",
+      "duration": "6 Months",
+      "level": "Beginner to Intermediate"
+    },
+    "hsk4": {
+      "title": "HSK-4 Preparation Course",
+      "description": "Intensive preparation for HSK Level 4 certification. Covers all required vocabulary, grammar, and exam strategies.",
+      "duration": "4 Months",
+      "level": "Intermediate"
+    },
+    "crazy": {
+      "title": "Crazy Chinese Course",
+      "description": "Accelerated immersive learning for fast results. Ideal for motivated learners who want rapid progress.",
+      "duration": "3 Months",
+      "level": "All Levels"
+    },
+    "evening": {
+      "title": "Evening Chinese Course",
+      "description": "Flexible evening classes for working professionals. Learn Chinese without disrupting your work schedule.",
+      "duration": "8 Months",
+      "level": "All Levels"
+    },
+    "online": {
+      "title": "Online Chinese Course",
+      "description": "Learn from anywhere with our interactive online platform. Live classes with experienced teachers.",
+      "duration": "Flexible",
+      "level": "All Levels"
+    },
+    "children": {
+      "title": "Children's Chinese Course",
+      "description": "Fun and engaging Chinese lessons designed for young learners aged 6-15. Games, songs, and interactive activities.",
+      "duration": "12 Months",
+      "level": "Beginner"
+    }
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Building bridges between Bangladesh and China through language education",
+    "description": "Established on January 1, 2016, Yidai Yilu Chinese Institute has been at the forefront of Chinese language education in Bangladesh. We are proud to be affiliated with the Bangladesh Technical Education Board (Affiliation No. 50803).",
+    "mission": "Our mission is to foster cultural exchange and economic cooperation between Bangladesh and China by providing world-class Chinese language education. As the Belt and Road Initiative strengthens ties between our nations, the demand for Chinese language skills continues to grow.",
+    "stats": {
+      "students": "5000+",
+      "studentsLabel": "Students Trained",
+      "teachers": "25+",
+      "teachersLabel": "Expert Teachers",
+      "years": "9+",
+      "yearsLabel": "Years Experience",
+      "success": "95%",
+      "successLabel": "Success Rate"
+    },
+    "readMore": "Read More"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive support for your Chinese language journey",
+    "teaching": {
+      "title": "Language Teaching",
+      "description": "Professional Chinese language courses from beginner to advanced levels"
+    },
+    "placement": {
+      "title": "Job Placement",
+      "description": "Career assistance and job placement services for Chinese-speaking roles"
+    },
+    "abroad": {
+      "title": "Study Abroad",
+      "description": "Scholarship guidance and support for studying in China"
+    },
+    "hsk": {
+      "title": "HSK Preparation",
+      "description": "Comprehensive HSK exam preparation and registration support"
+    },
+    "internship": {
+      "title": "Internship Support",
+      "description": "Internship opportunities with Chinese companies in Bangladesh"
+    },
+    "translation": {
+      "title": "Translation Services",
+      "description": "Professional interpretation and document translation services"
+    },
+    "tour": {
+      "title": "Tour Guide Help",
+      "description": "Tour guide training and assistance for tourism industry"
+    }
+  },
+  "books": {
+    "title": "Our Books",
+    "subtitle": "Comprehensive learning materials developed by our expert team",
+    "viewAll": "View All Books"
+  },
+  "testimonials": {
+    "title": "What Students Say",
+    "subtitle": "Hear from our successful students about their learning journey"
+  },
+  "media": {
+    "title": "We Are in the Media",
+    "subtitle": "News coverage and recognition of our institute's achievements",
+    "readArticle": "Read Article"
+  },
+  "partners": {
+    "title": "Our Partners",
+    "subtitle": "Collaborating with leading educational institutions worldwide"
+  },
+  "gallery": {
+    "title": "Photo Gallery",
+    "subtitle": "Glimpses of campus life, events, and student activities",
+    "viewAll": "View All Photos",
+    "categories": {
+      "all": "All",
+      "classroom": "Classroom",
+      "students": "Students",
+      "events": "Events",
+      "campus": "Campus"
+    }
+  },
+  "footer": {
+    "description": "Yidai Yilu Chinese Institute is Bangladesh's leading Chinese language education center, dedicated to fostering Bangladesh-China friendship through quality education.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Info",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Subscribe to get updates on courses and events",
+    "subscribe": "Subscribe",
+    "emailPlaceholder": "Enter your email",
+    "address": "House 123, Road 45, Dhanmondi, Dhaka-1205, Bangladesh",
+    "phone": "+880 1234-567890",
+    "email": "info@yidaiyilu.edu.bd",
+    "copyright": "© 2024 Yidai Yilu Chinese Institute. All rights reserved.",
+    "affiliatedWith": "Affiliated with Bangladesh Technical Education Board (No. 50803)"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with us for any inquiries",
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "phone": "Phone Number",
+      "subject": "Subject",
+      "message": "Your Message",
+      "submit": "Send Message"
+    }
+  },
+  "language": {
+    "en": "English",
+    "bn": "বাংলা",
+    "zh": "中文"
+  }
+}
