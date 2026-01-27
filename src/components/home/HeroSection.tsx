@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, GraduationCap, Users, BookOpen } from 'lucide-react';
+import { ArrowRight, GraduationCap, Users, BookOpen, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,28 +38,40 @@ const HeroSection = () => {
     : t('hero.subtitle');
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background with proper brand colors - Deep Green to Black */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#0A6B4E] to-[#1A1A1A] chinese-pattern" />
-      
-      {/* Animated floating characters */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-black">
+      {/* Layered background gradients */}
+      <div className="absolute inset-0">
+        {/* Main gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-black via-primary/20 to-brand-black" />
+        
+        {/* Radial glow effects */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/30 rounded-full blur-[120px] -translate-y-1/2" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[100px] translate-y-1/2" />
+        
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 chinese-pattern opacity-30" />
+      </div>
+
+      {/* Animated floating Chinese characters */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {['中', '文', '学', '习', '友', '谊'].map((char, i) => (
+        {['中', '文', '学', '习', '友', '谊', '教', '育'].map((char, i) => (
           <motion.span
             key={i}
-            className="absolute text-6xl font-chinese text-white/10 select-none"
+            className="absolute text-7xl md:text-9xl font-chinese text-primary/5 select-none font-bold"
             style={{
-              left: `${10 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
+              left: `${5 + i * 12}%`,
+              top: `${15 + (i % 4) * 20}%`,
             }}
             animate={{
-              y: [-20, 20, -20],
-              opacity: [0.1, 0.2, 0.1],
+              y: [-30, 30, -30],
+              rotate: [-5, 5, -5],
+              opacity: [0.03, 0.08, 0.03],
             }}
             transition={{
-              duration: 4 + i,
+              duration: 8 + i * 0.5,
               repeat: Infinity,
-              delay: i * 0.5,
+              delay: i * 0.3,
+              ease: "easeInOut",
             }}
           >
             {char}
@@ -67,46 +79,61 @@ const HeroSection = () => {
         ))}
       </div>
 
-      <div className="container relative z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+      {/* Decorative lines */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
+      </div>
+
+      <div className="container relative z-10 py-20">
+        <div className="max-w-5xl mx-auto text-center space-y-10">
+          {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7 }}
           >
-            <span className="inline-block px-4 py-2 rounded-full bg-white/20 text-white text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/20 border border-primary/30 text-primary-foreground text-sm font-medium backdrop-blur-sm">
+              <Sparkles className="h-4 w-4 text-brand-gold" />
               {heroSettings?.badge_text || '🇧🇩 Bangladesh - China 🇨🇳 Friendship'}
             </span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+          {/* Main headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="space-y-4"
           >
-            {tagline}
-          </motion.h1>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-primary-foreground leading-[1.1] tracking-tight">
+              <span className="bg-gradient-to-r from-primary-foreground via-primary-foreground to-primary/80 bg-clip-text text-transparent">
+                {tagline}
+              </span>
+            </h1>
+          </motion.div>
 
+          {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto"
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-lg sm:text-xl md:text-2xl text-primary-foreground/70 max-w-3xl mx-auto leading-relaxed"
           >
             {subtitle}
           </motion.p>
 
+          {/* CTA Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap items-center justify-center gap-4"
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
             <Button
               asChild
               size="lg"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 h-14"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 h-14 rounded-full shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:shadow-accent/30 hover:scale-105"
             >
               <Link to="/admission">
                 {t('hero.enrollNow')}
@@ -117,7 +144,7 @@ const HeroSection = () => {
               asChild
               size="lg"
               variant="outline"
-              className="border-white/50 text-white hover:bg-white/10 text-lg px-8 h-14"
+              className="border-primary/50 text-primary-foreground bg-primary/10 hover:bg-primary/20 text-lg px-8 h-14 rounded-full backdrop-blur-sm transition-all hover:scale-105"
             >
               <Link to="/courses">{t('hero.viewCourses')}</Link>
             </Button>
@@ -125,7 +152,7 @@ const HeroSection = () => {
               asChild
               size="lg"
               variant="ghost"
-              className="text-white hover:bg-white/10 text-lg px-8 h-14"
+              className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 h-14 rounded-full transition-all"
             >
               <Link to="/contact">{t('hero.contactUs')}</Link>
             </Button>
@@ -133,38 +160,48 @@ const HeroSection = () => {
 
           {/* Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 max-w-lg mx-auto"
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="grid grid-cols-3 gap-6 sm:gap-12 pt-16 max-w-2xl mx-auto"
           >
-            <div className="text-center">
-              <GraduationCap className="h-8 w-8 mx-auto text-[#D72638] mb-2" />
-              <div className="text-2xl sm:text-3xl font-bold text-white">{heroSettings?.stat_students || '5000+'}</div>
-              <div className="text-sm text-white/70">{t('hero.students')}</div>
-            </div>
-            <div className="text-center">
-              <Users className="h-8 w-8 mx-auto text-[#D72638] mb-2" />
-              <div className="text-2xl sm:text-3xl font-bold text-white">{heroSettings?.stat_teachers || '25+'}</div>
-              <div className="text-sm text-white/70">{t('hero.teachers')}</div>
-            </div>
-            <div className="text-center">
-              <BookOpen className="h-8 w-8 mx-auto text-[#D72638] mb-2" />
-              <div className="text-2xl sm:text-3xl font-bold text-white">{heroSettings?.stat_years || '9+'}</div>
-              <div className="text-sm text-white/70">{t('hero.years')}</div>
-            </div>
+            {[
+              { icon: GraduationCap, value: heroSettings?.stat_students || '5000+', label: t('hero.students') },
+              { icon: Users, value: heroSettings?.stat_teachers || '25+', label: t('hero.teachers') },
+              { icon: BookOpen, value: heroSettings?.stat_years || '9+', label: t('hero.years') },
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className="text-center group"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/20 border border-accent/30 mb-4 group-hover:bg-accent/30 transition-colors">
+                  <stat.icon className="h-7 w-7 text-accent" />
+                </div>
+                <div className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-1">{stat.value}</div>
+                <div className="text-sm text-primary-foreground/60">{stat.label}</div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </div>
 
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+
       {/* Scroll indicator */}
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
+        animate={{ y: [0, 12, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       >
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-          <div className="w-1.5 h-3 bg-white/50 rounded-full" />
+        <div className="w-7 h-12 border-2 border-primary-foreground/30 rounded-full flex items-start justify-center p-2">
+          <motion.div 
+            className="w-1.5 h-3 bg-primary rounded-full"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         </div>
       </motion.div>
     </section>
