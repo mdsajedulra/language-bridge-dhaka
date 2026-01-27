@@ -1,58 +1,53 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ExternalLink, Calendar } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
-const mediaArticles = [
-  {
-    id: 1,
-    title: 'Bangladesh-China Development Partnership Strengthens',
-    titleBn: 'বাংলাদেশ-চীন উন্নয়ন অংশীদারিত্ব শক্তিশালী হচ্ছে',
-    titleZh: '孟中发展伙伴关系加强',
-    source: 'The Daily Star',
-    date: '2024-01-15',
-    image: '📰',
-  },
-  {
-    id: 2,
-    title: 'Chinese Language Research Achievements Recognized',
-    titleBn: 'চীনা ভাষা গবেষণা অর্জন স্বীকৃত',
-    titleZh: '汉语研究成果获认可',
-    source: 'Prothom Alo',
-    date: '2024-02-20',
-    image: '📰',
-  },
-  {
-    id: 3,
-    title: 'Chinese National Day Celebrated at Yidai Yilu',
-    titleBn: 'ইদাই ইলুতে চীনের জাতীয় দিবস উদযাপন',
-    titleZh: '一带一路学院庆祝中国国庆',
-    source: 'Bangladesh Post',
-    date: '2023-10-01',
-    image: '📰',
-  },
-  {
-    id: 4,
-    title: 'Students Receive Scholarships for Chinese Universities',
-    titleBn: 'শিক্ষার্থীরা চীনা বিশ্ববিদ্যালয়ের জন্য বৃত্তি পেয়েছেন',
-    titleZh: '学生获得中国大学奖学金',
-    source: 'Dhaka Tribune',
-    date: '2024-03-10',
-    image: '📰',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
 
 const MediaSection = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
 
-  const getLocalizedTitle = (article: typeof mediaArticles[0]) => {
-    switch (i18n.language) {
-      case 'bn': return article.titleBn;
-      case 'zh': return article.titleZh;
-      default: return article.title;
-    }
-  };
+  const { data: mediaArticles, isLoading } = useQuery({
+    queryKey: ['media'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('media')
+        .select('*')
+        .eq('is_active', true)
+        .order('published_at', { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-background">
+        <div className="container">
+          <div className="text-center mb-12">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-64 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!mediaArticles || mediaArticles.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-background">
@@ -82,23 +77,47 @@ const MediaSection = () => {
             >
               <Card className="h-full hover:shadow-lg transition-all hover:-translate-y-1 group cursor-pointer">
                 <CardHeader className="pb-2">
-                  <div className="h-32 bg-secondary rounded-lg flex items-center justify-center text-5xl mb-4">
-                    {article.image}
-                  </div>
+                  {article.image_url ? (
+                    <img 
+                      src={article.image_url} 
+                      alt={getLocalizedField(article, 'title')}
+                      className="h-32 w-full object-cover rounded-lg mb-4"
+                    />
+                  ) : (
+                    <div className="h-32 bg-secondary rounded-lg flex items-center justify-center text-5xl mb-4">
+                      📰
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                     <Calendar className="h-3 w-3" />
-                    {article.date}
-                    <span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full">
-                      {article.source}
-                    </span>
+                    {article.published_at && format(new Date(article.published_at), 'yyyy-MM-dd')}
+                    {article.source && (
+                      <span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                        {article.source}
+                      </span>
+                    )}
                   </div>
-                  <CardTitle className="text-base line-clamp-2">{getLocalizedTitle(article)}</CardTitle>
+                  <CardTitle className="text-base line-clamp-2">{getLocalizedField(article, 'title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="ghost" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                    {t('media.readArticle')}
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
+                  {article.external_url ? (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground"
+                      asChild
+                    >
+                      <a href={article.external_url} target="_blank" rel="noopener noreferrer">
+                        {t('media.readArticle')}
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button variant="ghost" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                      {t('media.readArticle')}
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>

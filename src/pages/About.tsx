@@ -3,21 +3,72 @@ import { motion } from 'framer-motion';
 import { Award, Calendar, Users, TrendingUp, Target, Eye, Heart } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const About = () => {
   const { t } = useTranslation();
+  const { getLocalizedText } = useLocalized();
+
+  const { data: heroSettings } = useQuery({
+    queryKey: ['hero-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('hero_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: siteSettings, isLoading: settingsLoading } = useQuery({
+    queryKey: ['site-settings-about'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .in('key', ['mission', 'vision', 'values', 'about_story']);
+      if (error) throw error;
+      return data?.reduce((acc, item) => {
+        acc[item.key] = item;
+        return acc;
+      }, {} as Record<string, any>);
+    },
+  });
 
   const stats = [
-    { key: 'students', icon: Users, value: '5000+', label: 'Students Trained' },
-    { key: 'teachers', icon: Award, value: '25+', label: 'Expert Teachers' },
-    { key: 'years', icon: Calendar, value: '9+', label: 'Years Experience' },
+    { key: 'students', icon: Users, value: heroSettings?.stat_students || '5000+', label: 'Students Trained' },
+    { key: 'teachers', icon: Award, value: heroSettings?.stat_teachers || '25+', label: 'Expert Teachers' },
+    { key: 'years', icon: Calendar, value: heroSettings?.stat_years || '9+', label: 'Years Experience' },
     { key: 'success', icon: TrendingUp, value: '95%', label: 'Success Rate' },
   ];
 
   const values = [
-    { icon: Target, title: 'Mission', description: 'To foster cultural exchange and economic cooperation between Bangladesh and China by providing world-class Chinese language education.' },
-    { icon: Eye, title: 'Vision', description: 'To be the leading Chinese language education center in South Asia, creating bridges of understanding between nations.' },
-    { icon: Heart, title: 'Values', description: 'Excellence, integrity, cultural respect, student-centered learning, and continuous innovation in education.' },
+    { 
+      icon: Target, 
+      title: 'Mission', 
+      description: siteSettings?.mission 
+        ? getLocalizedText(siteSettings.mission.value_en, siteSettings.mission.value_bn, siteSettings.mission.value_zh)
+        : 'To foster cultural exchange and economic cooperation between Bangladesh and China by providing world-class Chinese language education.' 
+    },
+    { 
+      icon: Eye, 
+      title: 'Vision', 
+      description: siteSettings?.vision
+        ? getLocalizedText(siteSettings.vision.value_en, siteSettings.vision.value_bn, siteSettings.vision.value_zh)
+        : 'To be the leading Chinese language education center in South Asia, creating bridges of understanding between nations.' 
+    },
+    { 
+      icon: Heart, 
+      title: 'Values', 
+      description: siteSettings?.values
+        ? getLocalizedText(siteSettings.values.value_en, siteSettings.values.value_bn, siteSettings.values.value_zh)
+        : 'Excellence, integrity, cultural respect, student-centered learning, and continuous innovation in education.' 
+    },
   ];
 
   return (
@@ -56,7 +107,10 @@ const About = () => {
                 {t('about.mission')}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                As the Belt and Road Initiative continues to strengthen ties between Bangladesh and China, the demand for Chinese language proficiency has grown exponentially. Our institute stands at the forefront of this cultural and economic exchange, preparing students for success in an increasingly interconnected world.
+                {siteSettings?.about_story
+                  ? getLocalizedText(siteSettings.about_story.value_en, siteSettings.about_story.value_bn, siteSettings.about_story.value_zh)
+                  : 'As the Belt and Road Initiative continues to strengthen ties between Bangladesh and China, the demand for Chinese language proficiency has grown exponentially. Our institute stands at the forefront of this cultural and economic exchange, preparing students for success in an increasingly interconnected world.'
+                }
               </p>
             </motion.div>
           </div>

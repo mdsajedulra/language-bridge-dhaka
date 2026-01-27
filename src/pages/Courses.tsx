@@ -1,25 +1,41 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Clock, Users, Award, ArrowRight, BookOpen, Laptop, Moon, Zap, Baby } from 'lucide-react';
+import { Clock, ArrowRight, BookOpen, Laptop, Moon, Zap, Baby, Award, LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const courseIcons = {
-  communicative: BookOpen,
-  hsk4: Award,
-  crazy: Zap,
-  evening: Moon,
-  online: Laptop,
-  children: Baby,
+const iconMap: Record<string, LucideIcon> = {
+  BookOpen,
+  Award,
+  Zap,
+  Moon,
+  Laptop,
+  Baby,
 };
-
-const courses = ['communicative', 'hsk4', 'crazy', 'evening', 'online', 'children'] as const;
 
 const Courses = () => {
   const { t } = useTranslation();
+  const { getLocalizedField } = useLocalized();
+
+  const { data: courses, isLoading } = useQuery({
+    queryKey: ['courses-all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <Layout>
@@ -42,58 +58,73 @@ const Courses = () => {
       {/* Courses Grid */}
       <section className="py-20 bg-background">
         <div className="container">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course, index) => {
-              const Icon = courseIcons[course];
-              return (
-                <motion.div
-                  key={course}
-                  id={course}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="h-full hover:shadow-xl transition-all group">
-                    <CardHeader>
-                      <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        <Icon className="h-8 w-8" />
-                      </div>
-                      <Badge variant="secondary" className="w-fit mb-2">
-                        {t(`courses.${course}.level`)}
-                      </Badge>
-                      <CardTitle className="text-2xl">{t(`courses.${course}.title`)}</CardTitle>
-                      <CardDescription className="text-muted-foreground text-base">
-                        {t(`courses.${course}.description`)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-primary" />
-                          <span>{t(`courses.${course}.duration`)}</span>
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="h-80 rounded-xl" />
+              ))}
+            </div>
+          ) : courses && courses.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {courses.map((course, index) => {
+                const Icon = iconMap[course.icon || 'BookOpen'] || BookOpen;
+                return (
+                  <motion.div
+                    key={course.id}
+                    id={course.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="h-full hover:shadow-xl transition-all group">
+                      <CardHeader>
+                        <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                          <Icon className="h-8 w-8" />
                         </div>
-                      </div>
-                      <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li>• Expert native Chinese teachers</li>
-                        <li>• Comprehensive study materials</li>
-                        <li>• Certificate upon completion</li>
-                        <li>• Job placement support</li>
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                        <Link to="/admission">
-                          Enroll Now
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
+                        {course.price && (
+                          <Badge variant="secondary" className="w-fit mb-2">
+                            ৳{course.price}
+                          </Badge>
+                        )}
+                        <CardTitle className="text-2xl">{getLocalizedField(course, 'title')}</CardTitle>
+                        <CardDescription className="text-muted-foreground text-base">
+                          {getLocalizedField(course, 'description')}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-primary" />
+                            <span>{getLocalizedField(course, 'duration') || 'Flexible'}</span>
+                          </div>
+                        </div>
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li>• Expert native Chinese teachers</li>
+                          <li>• Comprehensive study materials</li>
+                          <li>• Certificate upon completion</li>
+                          <li>• Job placement support</li>
+                        </ul>
+                      </CardContent>
+                      <CardFooter>
+                        <Button asChild className="w-full bg-primary hover:bg-primary/90">
+                          <Link to="/admission">
+                            Enroll Now
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No courses available yet.</p>
+            </div>
+          )}
         </div>
       </section>
 

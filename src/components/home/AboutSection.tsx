@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Award, Calendar, Users, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const stats = [
   { key: 'students', icon: Users },
@@ -13,6 +16,30 @@ const stats = [
 
 const AboutSection = () => {
   const { t } = useTranslation();
+
+  const { data: heroSettings, isLoading } = useQuery({
+    queryKey: ['hero-settings-about'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('hero_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getStatValue = (key: string) => {
+    if (!heroSettings) return '...';
+    switch (key) {
+      case 'students': return heroSettings.stat_students || '5000+';
+      case 'teachers': return heroSettings.stat_teachers || '25+';
+      case 'years': return heroSettings.stat_years || '9+';
+      case 'success': return '95%';
+      default: return '...';
+    }
+  };
 
   return (
     <section className="py-20 bg-background">
@@ -74,9 +101,13 @@ const AboutSection = () => {
                   <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Icon className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="text-3xl font-bold text-foreground mb-1">
-                    {t(`about.stats.${stat.key}`)}
-                  </div>
+                  {isLoading ? (
+                    <Skeleton className="h-10 w-20 mx-auto mb-1" />
+                  ) : (
+                    <div className="text-3xl font-bold text-foreground mb-1">
+                      {getStatValue(stat.key)}
+                    </div>
+                  )}
                   <div className="text-sm text-muted-foreground">
                     {t(`about.stats.${stat.key}Label`)}
                   </div>

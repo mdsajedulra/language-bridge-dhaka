@@ -3,43 +3,34 @@ import { Calendar, Bell } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-const notices = [
-  {
-    id: 1,
-    title: 'New HSK-4 Batch Starting Soon',
-    date: '2024-01-25',
-    category: 'Course',
-    description: 'Registration is now open for our upcoming HSK-4 preparation batch starting February 1st.',
-    isNew: true,
-  },
-  {
-    id: 2,
-    title: 'Chinese New Year Celebration',
-    date: '2024-01-20',
-    category: 'Event',
-    description: 'Join us for the Chinese New Year celebration at our campus. Cultural activities, food, and performances!',
-    isNew: true,
-  },
-  {
-    id: 3,
-    title: 'Scholarship Announcement',
-    date: '2024-01-15',
-    category: 'Scholarship',
-    description: '10 students have been selected for the China Government Scholarship 2024. Congratulations!',
-    isNew: false,
-  },
-  {
-    id: 4,
-    title: 'Holiday Notice',
-    date: '2024-01-10',
-    category: 'Notice',
-    description: 'The institute will remain closed from January 26-28 for national holidays.',
-    isNew: false,
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useLocalized } from '@/hooks/useLocalized';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format, isAfter, subDays } from 'date-fns';
 
 const Notice = () => {
+  const { getLocalizedField } = useLocalized();
+
+  const { data: notices, isLoading } = useQuery({
+    queryKey: ['notices'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notices')
+        .select('*')
+        .eq('is_active', true)
+        .order('is_pinned', { ascending: false })
+        .order('published_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isNew = (dateStr: string | null) => {
+    if (!dateStr) return false;
+    return isAfter(new Date(dateStr), subDays(new Date(), 7));
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -63,44 +54,60 @@ const Notice = () => {
       {/* Notices */}
       <section className="py-20 bg-background">
         <div className="container max-w-4xl">
-          <div className="space-y-6">
-            {notices.map((notice, index) => (
-              <motion.div
-                key={notice.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={notice.isNew ? 'default' : 'secondary'}>
-                            {notice.category}
-                          </Badge>
-                          {notice.isNew && (
-                            <Badge className="bg-accent text-accent-foreground">New</Badge>
-                          )}
+          {isLoading ? (
+            <div className="space-y-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-40 rounded-xl" />
+              ))}
+            </div>
+          ) : notices && notices.length > 0 ? (
+            <div className="space-y-6">
+              {notices.map((notice, index) => (
+                <motion.div
+                  key={notice.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant={notice.is_pinned ? 'default' : 'secondary'}>
+                              {notice.category || 'General'}
+                            </Badge>
+                            {isNew(notice.published_at) && (
+                              <Badge className="bg-accent text-accent-foreground">New</Badge>
+                            )}
+                            {notice.is_pinned && (
+                              <Badge variant="outline">📌 Pinned</Badge>
+                            )}
+                          </div>
+                          <CardTitle className="text-xl">{getLocalizedField(notice, 'title')}</CardTitle>
                         </div>
-                        <CardTitle className="text-xl">{notice.title}</CardTitle>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+                          <Calendar className="h-4 w-4" />
+                          {notice.published_at && format(new Date(notice.published_at), 'yyyy-MM-dd')}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
-                        <Calendar className="h-4 w-4" />
-                        {notice.date}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">
-                      {notice.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-base">
+                        {getLocalizedField(notice, 'content')}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Bell className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No notices available yet.</p>
+            </div>
+          )}
         </div>
       </section>
     </Layout>
