@@ -82,6 +82,7 @@ export type Database = {
           is_active: boolean | null
           is_featured: boolean | null
           name: string
+          phone: string | null
           photo_url: string | null
           story_bn: string | null
           story_en: string | null
@@ -98,6 +99,7 @@ export type Database = {
           is_active?: boolean | null
           is_featured?: boolean | null
           name: string
+          phone?: string | null
           photo_url?: string | null
           story_bn?: string | null
           story_en?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           is_active?: boolean | null
           is_featured?: boolean | null
           name?: string
+          phone?: string | null
           photo_url?: string | null
           story_bn?: string | null
           story_en?: string | null
