@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 interface ParsedAlumni {
   name: string;
   phone?: string;
+  address?: string;
   batch_year?: number | null;
   company?: string;
   current_position_en?: string;
@@ -28,9 +29,9 @@ interface BulkUploadAlumniProps {
   onSuccess: () => void;
 }
 
-const SAMPLE_CSV_CONTENT = `name,phone,batch_year,company,current_position_en,current_position_bn,current_position_zh,story_en,story_bn,story_zh
-রহিম উদ্দিন,01712345678,2020,Huawei Technologies,Software Engineer,সফটওয়্যার ইঞ্জিনিয়ার,软件工程师,My journey at Huawei...,হুয়াওয়েতে আমার যাত্রা...,我在华为的旅程...
-করিম খান,01812345678,2021,Alibaba Group,Product Manager,প্রোডাক্ট ম্যানেজার,产品经理,Started as intern...,ইন্টার্ন হিসেবে শুরু...,从实习生开始...`;
+const SAMPLE_CSV_CONTENT = `name,phone,address,batch_year,company,current_position_en,current_position_bn,current_position_zh,story_en,story_bn,story_zh
+রহিম উদ্দিন,01712345678,Dhaka,2020,Huawei Technologies,Software Engineer,সফটওয়্যার ইঞ্জিনিয়ার,软件工程师,My journey at Huawei...,হুয়াওয়েতে আমার যাত্রা...,我在华为的旅程...
+করিম খান,01812345678,Chittagong,2021,Alibaba Group,Product Manager,প্রোডাক্ট ম্যানেজার,产品经理,Started as intern...,ইন্টার্ন হিসেবে শুরু...,从实习生开始...`;
 
 export const BulkUploadAlumni = ({ onSuccess }: BulkUploadAlumniProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,6 +66,7 @@ export const BulkUploadAlumni = ({ onSuccess }: BulkUploadAlumniProps) => {
     return {
       name,
       phone: phone || undefined,
+      address: row.address?.trim() || undefined,
       batch_year,
       company: row.company?.trim() || undefined,
       current_position_en: row.current_position_en?.trim() || undefined,
@@ -144,6 +146,7 @@ export const BulkUploadAlumni = ({ onSuccess }: BulkUploadAlumniProps) => {
       const insertData = chunk.map(row => ({
         name: row.name,
         phone: row.phone || null,
+        address: row.address || null,
         batch_year: row.batch_year || null,
         company: row.company || null,
         current_position_en: row.current_position_en || null,
