@@ -1,211 +1,170 @@
 
-
-# Cloudinary Image Upload Integration পরিকল্পনা
+# Alumni Phone Number ও Bulk Upload Feature
 
 ## সারসংক্ষেপ
-সব Admin pages-এ Cloudinary ব্যবহার করে image/media upload functionality যোগ করা হবে। এটি আগের Supabase Storage এর বদলে Cloudinary CDN ব্যবহার করবে।
-
-## Cloudinary সুবিধা
-- দ্রুত image loading (global CDN)
-- Automatic image optimization
-- On-the-fly image transformation (resize, crop, format)
-- Better performance for media-heavy websites
+Alumni টেবিলে phone number field যোগ করা হবে এবং Excel/CSV ফাইল থেকে bulk upload করার সুবিধা দেওয়া হবে।
 
 ---
 
-## যেসব Admin Pages-এ Image Upload যোগ হবে
+## যা করা হবে
 
-| Page | Image Field | বর্তমান অবস্থা |
-|------|-------------|----------------|
-| Settings Admin | Logo | URL input + Supabase upload |
-| Hero Admin | Background Image | শুধু URL input |
-| Courses Admin | Course Image | শুধু URL input |
-| Gallery Admin | Gallery Images | শুধু URL input |
-| Books Admin | Cover Image | শুধু URL input |
-| Media Admin | Media Image | শুধু URL input |
-| Partners Admin | Logo | শুধু URL input |
-| Alumni Admin | Photo | শুধু URL input |
-| Testimonials Admin | Avatar | শুধু URL input |
-| Videos Admin | Thumbnail | শুধু URL input |
+### ধাপ ১: Database Schema Update
+Alumni টেবিলে নতুন `phone` column যোগ করা হবে।
 
----
-
-## Implementation পদক্ষেপ
-
-### ধাপ ১: Cloudinary Configuration
-Environment variable হিসেবে Cloud Name সংরক্ষণ করা
-
-```text
-VITE_CLOUDINARY_CLOUD_NAME = "dw9jqevhl"
-VITE_CLOUDINARY_UPLOAD_PRESET = "unsigned_preset" (তৈরি করতে হবে)
+```sql
+ALTER TABLE alumni ADD COLUMN phone TEXT;
 ```
 
-**আপনার কাজ:** Cloudinary Dashboard-এ একটি **Unsigned Upload Preset** তৈরি করতে হবে:
-1. Cloudinary Dashboard > Settings > Upload
-2. "Add upload preset" ক্লিক করুন
-3. Signing Mode: **Unsigned** সিলেক্ট করুন
-4. একটি নাম দিন (যেমন: `language_bridge_upload`)
-5. Save করুন
-
-### ধাপ ২: Cloudinary Upload Utility তৈরি
-
-নতুন ফাইল: `src/lib/cloudinary.ts`
+### ধাপ ২: CSV/Excel Parser Library Install
+PapaParse library ব্যবহার করা হবে CSV parsing এর জন্য। এটি lightweight এবং Excel CSV format support করে।
 
 ```text
-Upload Flow:
-┌─────────────────┐
-│  User selects   │
-│     file        │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Validate file  │
-│  (type, size)   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│   Upload to     │
-│   Cloudinary    │
-│  (unsigned API) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Get secure_url │
-│  from response  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Save URL to    │
-│   Database      │
-└─────────────────┘
+Package: papaparse (CSV parsing)
 ```
 
-### ধাপ ৩: Reusable CloudinaryUpload Component তৈরি
+### ধাপ ৩: Bulk Upload Component তৈরি
 
-নতুন ফাইল: `src/components/ui/cloudinary-upload.tsx`
-
-**Features:**
-- File select button
-- Drag and drop support
-- Upload progress indicator
-- Image preview
-- Remove image option
-- File type validation (images, videos)
-- Size limit validation
+নতুন features:
+- CSV/Excel file upload button
+- File drag and drop support  
+- Data preview table (upload করার আগে দেখা যাবে)
+- Validation errors দেখানো
+- Import progress indicator
+- Success/error summary
 
 ```text
-┌────────────────────────────────────────────────────┐
-│  Cloudinary Upload Component                        │
-├────────────────────────────────────────────────────┤
-│                                                     │
-│  ┌──────────────────┐     ┌──────────────────┐     │
-│  │                  │     │  [Upload Image]  │     │
-│  │   Image Preview  │     │                  │     │
-│  │   (if uploaded)  │     │  [Remove]        │     │
-│  │                  │     │                  │     │
-│  └──────────────────┘     └──────────────────┘     │
-│                                                     │
-│  Supported: JPG, PNG, GIF, WebP (max 10MB)         │
-│                                                     │
-│  ┌────────────────────────────────────────────┐    │
-│  │  Or enter URL manually: [________________] │    │
-│  └────────────────────────────────────────────┘    │
-│                                                     │
-└────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  Bulk Upload Alumni                                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  📁 Drop CSV/Excel file here or click to browse        │ │
+│  │                                                         │ │
+│  │  [Download Sample Template]                             │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Preview (5 of 100 rows):                                   │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ Name        │ Phone       │ Batch │ Company │ Status │  │
+│  │─────────────┼─────────────┼───────┼─────────┼────────│  │
+│  │ রহিম উদ্দিন │ 01712345678 │ 2020  │ Huawei  │   ✓    │  │
+│  │ করিম খান   │ 01812345678 │ 2021  │ Alibaba │   ✓    │  │
+│  │ Invalid Row │             │ abc   │         │   ✗    │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Valid: 98 rows  │  Errors: 2 rows                          │
+│                                                              │
+│  [Cancel]                              [Import 98 Alumni]    │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### ধাপ ৪: সব Admin Pages Update করা
+### ধাপ ৪: Sample Template Download
+একটি sample CSV template download করার option থাকবে যাতে user সঠিক format জানতে পারে।
 
-প্রতিটি admin page-এ:
-1. URL input field এর পাশে Upload button যোগ
-2. CloudinaryUpload component integrate
-3. Upload success এ form state update
+**Template columns:**
+| Column Name | Required | Example |
+|-------------|----------|---------|
+| name | Yes | রহিম উদ্দিন |
+| phone | No | 01712345678 |
+| batch_year | No | 2020 |
+| company | No | Huawei Technologies |
+| current_position_en | No | Software Engineer |
+| current_position_bn | No | সফটওয়্যার ইঞ্জিনিয়ার |
+| current_position_zh | No | 软件工程师 |
+| story_en | No | My journey... |
+| story_bn | No | আমার যাত্রা... |
+| story_zh | No | 我的旅程... |
+
+### ধাপ ৫: Admin Page Update
+
+AlumniAdmin.tsx এ যা পরিবর্তন হবে:
+1. Phone field যোগ (form এ)
+2. Phone display (list এ)
+3. Bulk Upload button যোগ
+4. Bulk Upload Dialog component integrate
 
 ---
 
 ## সম্পূর্ণ File List
 
-| Action | File Path |
-|--------|-----------|
-| Create | `src/lib/cloudinary.ts` |
-| Create | `src/components/ui/cloudinary-upload.tsx` |
-| Update | `src/pages/admin/SettingsAdmin.tsx` |
-| Update | `src/pages/admin/HeroAdmin.tsx` |
-| Update | `src/pages/admin/CoursesAdmin.tsx` |
-| Update | `src/pages/admin/GalleryAdmin.tsx` |
-| Update | `src/pages/admin/BooksAdmin.tsx` |
-| Update | `src/pages/admin/MediaAdmin.tsx` |
-| Update | `src/pages/admin/PartnersAdmin.tsx` |
-| Update | `src/pages/admin/AlumniAdmin.tsx` |
-| Update | `src/pages/admin/TestimonialsAdmin.tsx` |
-| Update | `src/pages/admin/VideosAdmin.tsx` |
+| Action | File Path | Description |
+|--------|-----------|-------------|
+| Create | Migration SQL | `phone` column যোগ |
+| Create | `src/components/admin/BulkUploadAlumni.tsx` | Bulk upload component |
+| Update | `src/pages/admin/AlumniAdmin.tsx` | Phone field + Bulk upload integration |
+| Update | `src/pages/Alumni.tsx` | Phone display (optional) |
 
 ---
 
 ## Technical Details
 
-### Cloudinary Unsigned Upload API
+### CSV Parsing Flow
 
 ```text
-POST https://api.cloudinary.com/v1_1/{cloud_name}/image/upload
-
-FormData:
-- file: [image file or base64]
-- upload_preset: "your_unsigned_preset"
-- folder: "language-bridge" (optional)
-
-Response:
-{
-  "secure_url": "https://res.cloudinary.com/...",
-  "public_id": "language-bridge/image_abc123",
-  "width": 800,
-  "height": 600,
-  ...
-}
+User uploads file
+       │
+       ▼
+PapaParse reads file
+       │
+       ▼
+Validate each row:
+  - name required
+  - batch_year must be number
+  - phone format check (optional)
+       │
+       ▼
+Show preview with valid/invalid rows
+       │
+       ▼
+User clicks "Import"
+       │
+       ▼
+Batch insert to Supabase
+(chunks of 50 for performance)
+       │
+       ▼
+Show success/error summary
 ```
 
-### Upload Utility Function Structure
+### Validation Rules
 
 ```text
-uploadToCloudinary(file, options):
-  ├── Validate file type
-  ├── Validate file size (max 10MB)
-  ├── Create FormData
-  ├── POST to Cloudinary API
-  ├── Handle progress (optional)
-  └── Return secure_url or throw error
+- name: Required, non-empty string
+- phone: Optional, allows digits, +, -, spaces
+- batch_year: Optional, must be valid year (1900-2100)
+- company: Optional string
+- position fields: Optional strings
+- story fields: Optional strings
 ```
 
-### Component Props Interface
+### Batch Insert Strategy
 
 ```text
-CloudinaryUploadProps:
-  - value: string | null (current image URL)
-  - onChange: (url: string | null) => void
-  - folder?: string (Cloudinary folder)
-  - accept?: string (file types: "image/*" | "video/*")
-  - maxSize?: number (in MB, default 10)
-  - className?: string
+- Split data into chunks of 50 rows
+- Insert each chunk sequentially
+- Track success/failure count
+- Show progress bar during import
+- Report final summary
 ```
 
 ---
 
-## আপনার জন্য Action Item
+## Package Addition
 
-Cloudinary Dashboard-এ **Unsigned Upload Preset** তৈরি করতে হবে। করার পরে আমাকে preset এর নাম জানান, তারপর আমি implementation শুরু করব।
-
-অথবা যদি preset তৈরি না থাকে, আমি একটি default name (`language_bridge_upload`) দিয়ে শুরু করতে পারি এবং আপনি পরে সেই নামে preset তৈরি করতে পারবেন।
+```json
+{
+  "papaparse": "^5.4.1",
+  "@types/papaparse": "^5.3.14"
+}
+```
 
 ---
 
 ## সময় অনুমান
-- Cloudinary utility: ৫ মিনিট
-- Upload component: ১০ মিনিট
-- Admin pages update: ২৫ মিনিট (১০টি page)
+- Database migration: ২ মিনিট
+- BulkUploadAlumni component: ১৫ মিনিট
+- AlumniAdmin update: ১০ মিনিট
+- Testing & fixes: ৫ মিনিট
 
-**মোট: ~৪০ মিনিট**
-
+**মোট: ~৩২ মিনিট**
