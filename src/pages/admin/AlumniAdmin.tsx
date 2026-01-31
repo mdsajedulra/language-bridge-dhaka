@@ -11,11 +11,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, Star, Phone } from 'lucide-react';
+import { BulkUploadAlumni } from '@/components/admin/BulkUploadAlumni';
 
 interface Alumni {
   id: string;
   name: string;
+  phone: string | null;
   batch_year: number | null;
   company: string | null;
   current_position_en: string | null;
@@ -31,6 +33,7 @@ interface Alumni {
 
 const defaultAlumni: Partial<Alumni> = {
   name: '',
+  phone: '',
   batch_year: new Date().getFullYear(),
   company: '',
   current_position_en: '',
@@ -63,6 +66,7 @@ const AlumniAdmin = () => {
     mutationFn: async (data: Partial<Alumni>) => {
       const { error } = await supabase.from('alumni').insert([{
         name: data.name || '',
+        phone: data.phone || null,
         batch_year: data.batch_year || null,
         company: data.company || null,
         current_position_en: data.current_position_en || null,
@@ -148,16 +152,24 @@ const AlumniAdmin = () => {
                 <Plus className="mr-2 h-4 w-4" /> Add Alumni
               </Button>
             </DialogTrigger>
+            <BulkUploadAlumni onSuccess={() => queryClient.invalidateQueries({ queryKey: ['admin-alumni'] })} />
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingItem ? 'Edit Alumni' : 'Add New Alumni'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Name</Label>
                     <Input value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                   </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <Input value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="01712345678" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Batch Year</Label>
                     <Input type="number" value={formData.batch_year || ''} onChange={(e) => setFormData({ ...formData, batch_year: parseInt(e.target.value) || null })} />
@@ -240,6 +252,11 @@ const AlumniAdmin = () => {
                         {item.is_featured && <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">{item.current_position_en} {item.company && `at ${item.company}`}</p>
+                      {item.phone && (
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Phone className="h-3 w-3" /> {item.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
