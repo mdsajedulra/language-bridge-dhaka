@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Building, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, Star } from 'lucide-react';
 
 interface Alumni {
   id: string;
@@ -197,16 +198,19 @@ const AlumniAdmin = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>Photo URL</Label>
-                    <Input value={formData.photo_url || ''} onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })} placeholder="https://..." />
-                  </div>
-                  <div className="flex items-center gap-2 pt-6">
+                <CloudinaryUpload
+                  value={formData.photo_url || null}
+                  onChange={(url) => setFormData({ ...formData, photo_url: url || '' })}
+                  folder="language-bridge/alumni"
+                  label="Photo"
+                />
+
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
                     <Switch checked={formData.is_featured || false} onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })} />
                     <Label>Featured</Label>
                   </div>
-                  <div className="flex items-center gap-2 pt-6">
+                  <div className="flex items-center gap-2">
                     <Switch checked={formData.is_active || false} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
                     <Label>Active</Label>
                   </div>

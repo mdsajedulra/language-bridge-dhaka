@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 
@@ -139,10 +140,13 @@ const GalleryAdmin = () => {
                 <DialogTitle>{editingItem ? 'Edit Gallery Item' : 'Add New Gallery Item'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label>Image URL</Label>
-                  <Input value={formData.image_url || ''} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." required />
-                </div>
+                <CloudinaryUpload
+                  value={formData.image_url || null}
+                  onChange={(url) => setFormData({ ...formData, image_url: url || '' })}
+                  folder="language-bridge/gallery"
+                  label="Gallery Image"
+                  showUrlInput={true}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Star } from 'lucide-react';
 
@@ -152,16 +153,17 @@ const TestimonialsAdmin = () => {
                 <DialogTitle>{editingItem ? 'Edit Testimonial' : 'Add New Testimonial'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Name</Label>
-                    <Input value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-                  </div>
-                  <div>
-                    <Label>Avatar URL</Label>
-                    <Input value={formData.avatar_url || ''} onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} placeholder="https://..." />
-                  </div>
+                <div>
+                  <Label>Name</Label>
+                  <Input value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                 </div>
+
+                <CloudinaryUpload
+                  value={formData.avatar_url || null}
+                  onChange={(url) => setFormData({ ...formData, avatar_url: url || '' })}
+                  folder="language-bridge/testimonials"
+                  label="Avatar"
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
