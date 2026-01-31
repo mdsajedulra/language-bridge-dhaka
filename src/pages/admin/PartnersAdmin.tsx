@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react';
 
@@ -151,10 +152,12 @@ const PartnersAdmin = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label>Logo URL</Label>
-                  <Input value={formData.logo_url || ''} onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })} placeholder="https://..." />
-                </div>
+                <CloudinaryUpload
+                  value={formData.logo_url || null}
+                  onChange={(url) => setFormData({ ...formData, logo_url: url || '' })}
+                  folder="language-bridge/partners"
+                  label="Partner Logo"
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>

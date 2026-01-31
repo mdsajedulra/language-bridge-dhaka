@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 
@@ -260,7 +261,7 @@ const CoursesAdmin = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Price (৳)</Label>
                     <Input
@@ -277,15 +278,14 @@ const CoursesAdmin = () => {
                       onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
                     />
                   </div>
-                  <div>
-                    <Label>Image URL</Label>
-                    <Input
-                      value={formData.image_url || ''}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      placeholder="https://..."
-                    />
-                  </div>
                 </div>
+
+                <CloudinaryUpload
+                  value={formData.image_url || null}
+                  onChange={(url) => setFormData({ ...formData, image_url: url || '' })}
+                  folder="language-bridge/courses"
+                  label="Course Image"
+                />
 
                 {/* Features Section */}
                 <div className="border-t pt-4 mt-4">

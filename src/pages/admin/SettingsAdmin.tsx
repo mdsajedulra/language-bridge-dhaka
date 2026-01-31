@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
-import { Save, Upload, Trash2, Loader2 } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface Setting {
   id: string;
@@ -22,8 +23,6 @@ interface Setting {
 const SettingsAdmin = () => {
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<Record<string, Setting>>({});
-  const [uploading, setUploading] = useState(false);
-  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const { data: settingsData, isLoading } = useQuery({
     queryKey: ['admin-site-settings'],
@@ -89,93 +88,27 @@ const SettingsAdmin = () => {
     }));
   };
 
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleLogoChange = async (url: string | null) => {
+    // Update local state
+    setSettings((prev) => ({
+      ...prev,
+      logo: {
+        ...prev.logo,
+        image_url: url,
+      },
+    }));
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image size should be less than 2MB');
-      return;
-    }
-
-    setUploading(true);
+    // Save to database immediately
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `logo-${Date.now()}.${fileExt}`;
-      const filePath = `site/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('uploads')
-        .getPublicUrl(filePath);
-
-      // Update local state
-      setSettings((prev) => ({
-        ...prev,
-        logo: {
-          ...prev.logo,
-          image_url: publicUrl,
-        },
-      }));
-
-      // Save to database immediately
-      const { error: updateError } = await supabase
-        .from('site_settings')
-        .update({ image_url: publicUrl })
-        .eq('key', 'logo');
-
-      if (updateError) throw updateError;
-
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      toast.success('Logo uploaded successfully');
-    } catch (error: any) {
-      toast.error('Failed to upload logo: ' + error.message);
-    } finally {
-      setUploading(false);
-      if (logoInputRef.current) {
-        logoInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleRemoveLogo = async () => {
-    setUploading(true);
-    try {
-      // Update database
       const { error } = await supabase
         .from('site_settings')
-        .update({ image_url: null })
+        .update({ image_url: url })
         .eq('key', 'logo');
 
       if (error) throw error;
-
-      // Update local state
-      setSettings((prev) => ({
-        ...prev,
-        logo: {
-          ...prev.logo,
-          image_url: null,
-        },
-      }));
-
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      toast.success('Logo removed');
     } catch (error: any) {
-      toast.error('Failed to remove logo: ' + error.message);
-    } finally {
-      setUploading(false);
+      toast.error('Failed to update logo: ' + error.message);
     }
   };
 
@@ -365,62 +298,13 @@ const SettingsAdmin = () => {
               <CardDescription>Upload your institute logo</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Logo Preview */}
-                {settings.logo?.image_url && (
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={settings.logo.image_url}
-                      alt="Logo preview"
-                      className="h-20 w-20 object-contain rounded-lg border bg-white p-2"
-                    />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleRemoveLogo}
-                      disabled={uploading}
-                    >
-                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1" />}
-                      Remove
-                    </Button>
-                  </div>
-                )}
-
-                {/* Upload Button */}
-                <div className="flex items-center gap-4">
-                  <input
-                    type="file"
-                    ref={logoInputRef}
-                    onChange={handleLogoUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => logoInputRef.current?.click()}
-                    disabled={uploading}
-                  >
-                    {uploading ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Upload className="h-4 w-4 mr-2" />
-                    )}
-                    {settings.logo?.image_url ? 'Change Logo' : 'Upload Logo'}
-                  </Button>
-                  <span className="text-sm text-muted-foreground">PNG, JPG (max 2MB)</span>
-                </div>
-
-                {/* Or enter URL manually */}
-                <div className="border-t pt-4">
-                  <Label className="text-muted-foreground">Or enter image URL manually</Label>
-                  <Input
-                    className="mt-2"
-                    value={settings.logo?.image_url || ''}
-                    onChange={(e) => updateSetting('logo', 'image_url', e.target.value)}
-                    placeholder="https://example.com/logo.png"
-                  />
-                </div>
-              </div>
+              <CloudinaryUpload
+                value={settings.logo?.image_url || null}
+                onChange={handleLogoChange}
+                folder="language-bridge/site"
+                label="Site Logo"
+                maxSizeMB={2}
+              />
             </CardContent>
           </Card>
         </div>

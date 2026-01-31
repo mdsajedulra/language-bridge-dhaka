@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Play, Video } from 'lucide-react';
 
@@ -188,16 +189,17 @@ const VideosAdmin = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Video URL (YouTube/Vimeo)</Label>
-                    <Input value={formData.video_url || ''} onChange={(e) => setFormData({ ...formData, video_url: e.target.value })} placeholder="https://youtube.com/..." required />
-                  </div>
-                  <div>
-                    <Label>Thumbnail URL (optional)</Label>
-                    <Input value={formData.thumbnail_url || ''} onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })} placeholder="Auto-detected for YouTube" />
-                  </div>
+                <div>
+                  <Label>Video URL (YouTube/Vimeo)</Label>
+                  <Input value={formData.video_url || ''} onChange={(e) => setFormData({ ...formData, video_url: e.target.value })} placeholder="https://youtube.com/..." required />
                 </div>
+
+                <CloudinaryUpload
+                  value={formData.thumbnail_url || null}
+                  onChange={(url) => setFormData({ ...formData, thumbnail_url: url || '' })}
+                  folder="language-bridge/videos"
+                  label="Custom Thumbnail (optional, auto-detected for YouTube)"
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>

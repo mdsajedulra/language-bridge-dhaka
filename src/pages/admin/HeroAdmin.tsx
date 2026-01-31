@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 import { toast } from 'sonner';
 import { Save } from 'lucide-react';
 
@@ -217,23 +218,12 @@ const HeroAdmin = () => {
               <CardDescription>Optional background image for the hero section</CardDescription>
             </CardHeader>
             <CardContent>
-              <div>
-                <Label>Image URL</Label>
-                <Input
-                  value={formData.background_image_url || ''}
-                  onChange={(e) => setFormData({ ...formData, background_image_url: e.target.value })}
-                  placeholder="https://example.com/hero-bg.jpg"
-                />
-                {formData.background_image_url && (
-                  <div className="mt-4">
-                    <img
-                      src={formData.background_image_url}
-                      alt="Hero background preview"
-                      className="h-40 w-full object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
-              </div>
+              <CloudinaryUpload
+                value={formData.background_image_url || null}
+                onChange={(url) => setFormData({ ...formData, background_image_url: url || '' })}
+                folder="language-bridge/hero"
+                label="Background Image"
+              />
             </CardContent>
           </Card>
         </div>
