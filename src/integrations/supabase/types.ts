@@ -72,6 +72,7 @@ export type Database = {
       }
       alumni: {
         Row: {
+          address: string | null
           batch_year: number | null
           company: string | null
           created_at: string
@@ -89,6 +90,7 @@ export type Database = {
           story_zh: string | null
         }
         Insert: {
+          address?: string | null
           batch_year?: number | null
           company?: string | null
           created_at?: string
@@ -106,6 +108,7 @@ export type Database = {
           story_zh?: string | null
         }
         Update: {
+          address?: string | null
           batch_year?: number | null
           company?: string | null
           created_at?: string

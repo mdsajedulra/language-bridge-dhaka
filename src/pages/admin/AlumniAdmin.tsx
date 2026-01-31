@@ -18,6 +18,7 @@ interface Alumni {
   id: string;
   name: string;
   phone: string | null;
+  address: string | null;
   batch_year: number | null;
   company: string | null;
   current_position_en: string | null;
@@ -34,6 +35,7 @@ interface Alumni {
 const defaultAlumni: Partial<Alumni> = {
   name: '',
   phone: '',
+  address: '',
   batch_year: new Date().getFullYear(),
   company: '',
   current_position_en: '',
@@ -67,6 +69,7 @@ const AlumniAdmin = () => {
       const { error } = await supabase.from('alumni').insert([{
         name: data.name || '',
         phone: data.phone || null,
+        address: data.address || null,
         batch_year: data.batch_year || null,
         company: data.company || null,
         current_position_en: data.current_position_en || null,
@@ -169,6 +172,11 @@ const AlumniAdmin = () => {
                   </div>
                 </div>
 
+                <div>
+                  <Label>Address</Label>
+                  <Input value={formData.address || ''} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="Dhaka, Bangladesh" />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Batch Year</Label>
@@ -256,6 +264,9 @@ const AlumniAdmin = () => {
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <Phone className="h-3 w-3" /> {item.phone}
                         </p>
+                      )}
+                      {item.address && (
+                        <p className="text-sm text-muted-foreground">{item.address}</p>
                       )}
                     </div>
                   </div>
