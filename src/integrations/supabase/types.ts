@@ -676,6 +676,69 @@ export type Database = {
         }
         Relationships: []
       }
+      teachers: {
+        Row: {
+          bio_bn: string | null
+          bio_en: string | null
+          bio_zh: string | null
+          created_at: string
+          designation_bn: string | null
+          designation_en: string | null
+          designation_zh: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          sort_order: number | null
+          specialization_bn: string | null
+          specialization_en: string | null
+          specialization_zh: string | null
+        }
+        Insert: {
+          bio_bn?: string | null
+          bio_en?: string | null
+          bio_zh?: string | null
+          created_at?: string
+          designation_bn?: string | null
+          designation_en?: string | null
+          designation_zh?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number | null
+          specialization_bn?: string | null
+          specialization_en?: string | null
+          specialization_zh?: string | null
+        }
+        Update: {
+          bio_bn?: string | null
+          bio_en?: string | null
+          bio_zh?: string | null
+          created_at?: string
+          designation_bn?: string | null
+          designation_en?: string | null
+          designation_zh?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number | null
+          specialization_bn?: string | null
+          specialization_en?: string | null
+          specialization_zh?: string | null
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           avatar_url: string | null

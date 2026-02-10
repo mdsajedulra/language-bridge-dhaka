@@ -18,6 +18,7 @@ import Campus from "./pages/Campus";
 import Videos from "./pages/Videos";
 import Contact from "./pages/Contact";
 import Books from "./pages/Books";
+import Teachers from "./pages/Teachers";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/admin/Dashboard";
 import CoursesAdmin from "./pages/admin/CoursesAdmin";
@@ -37,6 +38,7 @@ import BooksAdmin from "./pages/admin/BooksAdmin";
 import MediaAdmin from "./pages/admin/MediaAdmin";
 import VideosAdmin from "./pages/admin/VideosAdmin";
 import TranslationsAdmin from "./pages/admin/TranslationsAdmin";
+import TeachersAdmin from "./pages/admin/TeachersAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +63,7 @@ const App = () => (
             <Route path="/campus" element={<Campus />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/teachers" element={<Teachers />} />
             <Route path="/books" element={<Books />} />
             <Route path="/auth" element={<Auth />} />
             
@@ -83,6 +86,7 @@ const App = () => (
             <Route path="/admin/translations" element={<TranslationsAdmin />} />
             <Route path="/admin/contacts" element={<ContactsAdmin />} />
             <Route path="/admin/applications" element={<ApplicationsAdmin />} />
+            <Route path="/admin/teachers" element={<TeachersAdmin />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
