@@ -42,6 +42,7 @@ const menuItems = [
   { path: '/admin/notices', label: 'Notices', icon: Bell },
   { path: '/admin/jobs', label: 'Jobs', icon: Briefcase },
   { path: '/admin/alumni', label: 'Alumni', icon: GraduationCap },
+  { path: '/admin/teachers', label: 'Teachers', icon: GraduationCap },
   { path: '/admin/services', label: 'Services', icon: Users },
   { path: '/admin/partners', label: 'Partners', icon: Handshake },
   { path: '/admin/gallery', label: 'Gallery', icon: Image },

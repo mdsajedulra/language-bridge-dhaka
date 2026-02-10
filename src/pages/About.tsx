@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocalized } from '@/hooks/useLocalized';
 import { Skeleton } from '@/components/ui/skeleton';
+import TeachersSection from '@/components/about/TeachersSection';
 
 const About = () => {
   const { t } = useTranslation();
@@ -144,6 +145,9 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* Our Teachers */}
+      <TeachersSection />
 
       {/* Mission, Vision, Values */}
       <section className="py-20 bg-background">
