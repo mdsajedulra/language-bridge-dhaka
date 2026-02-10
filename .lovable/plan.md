@@ -1,170 +1,139 @@
 
-# Alumni Phone Number ও Bulk Upload Feature
+# Our Teachers Feature
 
 ## সারসংক্ষেপ
-Alumni টেবিলে phone number field যোগ করা হবে এবং Excel/CSV ফাইল থেকে bulk upload করার সুবিধা দেওয়া হবে।
+একটি সম্পূর্ণ "Our Teachers" feature তৈরি হবে যেখানে থাকবে:
+1. Database-এ নতুন `teachers` table
+2. একটি আলাদা Teachers page (`/teachers`)
+3. About page-এ "Our Teachers" section
+4. Admin panel-এ Teachers management page
 
 ---
 
-## যা করা হবে
+## ধাপ ১: Database - `teachers` Table তৈরি
 
-### ধাপ ১: Database Schema Update
-Alumni টেবিলে নতুন `phone` column যোগ করা হবে।
+| Column | Type | Required | Default |
+|--------|------|----------|---------|
+| id | uuid | Yes | auto |
+| name | text | Yes | - |
+| phone | text | No | - |
+| email | text | No | - |
+| photo_url | text | No | - |
+| designation_en | text | No | - |
+| designation_bn | text | No | - |
+| designation_zh | text | No | - |
+| bio_en | text | No | - |
+| bio_bn | text | No | - |
+| bio_zh | text | No | - |
+| specialization_en | text | No | - |
+| specialization_bn | text | No | - |
+| specialization_zh | text | No | - |
+| is_featured | boolean | No | false |
+| is_active | boolean | No | true |
+| sort_order | integer | No | 0 |
+| created_at | timestamptz | Yes | now() |
 
-```sql
-ALTER TABLE alumni ADD COLUMN phone TEXT;
-```
+RLS Policies:
+- Anyone can view active teachers (SELECT where is_active = true)
+- Admins can manage all (ALL with has_role check)
 
-### ধাপ ২: CSV/Excel Parser Library Install
-PapaParse library ব্যবহার করা হবে CSV parsing এর জন্য। এটি lightweight এবং Excel CSV format support করে।
+---
 
-```text
-Package: papaparse (CSV parsing)
-```
+## ধাপ ২: Teachers Admin Page
 
-### ধাপ ৩: Bulk Upload Component তৈরি
+নতুন ফাইল: `src/pages/admin/TeachersAdmin.tsx`
 
-নতুন features:
-- CSV/Excel file upload button
-- File drag and drop support  
-- Data preview table (upload করার আগে দেখা যাবে)
-- Validation errors দেখানো
-- Import progress indicator
-- Success/error summary
+AlumniAdmin এর মতো same pattern follow করবে:
+- Full CRUD (Create, Read, Update, Delete)
+- Cloudinary image upload for teacher photo
+- Multi-language fields (designation, bio, specialization)
+- Featured ও Active toggle
+- Sort order management
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  Bulk Upload Alumni                                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  📁 Drop CSV/Excel file here or click to browse        │ │
-│  │                                                         │ │
-│  │  [Download Sample Template]                             │ │
-│  └────────────────────────────────────────────────────────┘ │
-│                                                              │
-│  Preview (5 of 100 rows):                                   │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │ Name        │ Phone       │ Batch │ Company │ Status │  │
-│  │─────────────┼─────────────┼───────┼─────────┼────────│  │
-│  │ রহিম উদ্দিন │ 01712345678 │ 2020  │ Huawei  │   ✓    │  │
-│  │ করিম খান   │ 01812345678 │ 2021  │ Alibaba │   ✓    │  │
-│  │ Invalid Row │             │ abc   │         │   ✗    │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                              │
-│  Valid: 98 rows  │  Errors: 2 rows                          │
-│                                                              │
-│  [Cancel]                              [Import 98 Alumni]    │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
+---
 
-### ধাপ ৪: Sample Template Download
-একটি sample CSV template download করার option থাকবে যাতে user সঠিক format জানতে পারে।
+## ধাপ ৩: Teachers Public Page
 
-**Template columns:**
-| Column Name | Required | Example |
-|-------------|----------|---------|
-| name | Yes | রহিম উদ্দিন |
-| phone | No | 01712345678 |
-| batch_year | No | 2020 |
-| company | No | Huawei Technologies |
-| current_position_en | No | Software Engineer |
-| current_position_bn | No | সফটওয়্যার ইঞ্জিনিয়ার |
-| current_position_zh | No | 软件工程师 |
-| story_en | No | My journey... |
-| story_bn | No | আমার যাত্রা... |
-| story_zh | No | 我的旅程... |
+নতুন ফাইল: `src/pages/Teachers.tsx`
 
-### ধাপ ৫: Admin Page Update
+Route: `/teachers`
 
-AlumniAdmin.tsx এ যা পরিবর্তন হবে:
-1. Phone field যোগ (form এ)
-2. Phone display (list এ)
-3. Bulk Upload button যোগ
-4. Bulk Upload Dialog component integrate
+Teachers দের profile cards দেখাবে:
+- Photo, Name, Designation
+- Specialization
+- Short bio
+- Featured teachers হাইলাইট হবে
+
+---
+
+## ধাপ ৪: About Page-এ "Our Teachers" Section
+
+নতুন component: `src/components/about/TeachersSection.tsx`
+
+About page-এ Stats section এর পরে একটি "Our Teachers" section যোগ হবে:
+- Featured teachers দেখাবে (max 4-6)
+- "View All Teachers" button থাকবে `/teachers` page-এ যাওয়ার জন্য
+
+---
+
+## ধাপ ৫: Routing ও Navigation Update
+
+- `App.tsx`-এ `/teachers` route যোগ
+- `App.tsx`-এ `/admin/teachers` route যোগ
+- `AdminLayout.tsx`-এ Teachers menu item যোগ
 
 ---
 
 ## সম্পূর্ণ File List
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| Create | Migration SQL | `phone` column যোগ |
-| Create | `src/components/admin/BulkUploadAlumni.tsx` | Bulk upload component |
-| Update | `src/pages/admin/AlumniAdmin.tsx` | Phone field + Bulk upload integration |
-| Update | `src/pages/Alumni.tsx` | Phone display (optional) |
+| Action | File Path |
+|--------|-----------|
+| Migration | `teachers` table তৈরি + RLS |
+| Create | `src/pages/admin/TeachersAdmin.tsx` |
+| Create | `src/pages/Teachers.tsx` |
+| Create | `src/components/about/TeachersSection.tsx` |
+| Update | `src/pages/About.tsx` (TeachersSection যোগ) |
+| Update | `src/App.tsx` (routes যোগ) |
+| Update | `src/components/admin/AdminLayout.tsx` (menu item যোগ) |
 
 ---
 
 ## Technical Details
 
-### CSV Parsing Flow
+### TeachersSection Component (About Page)
 
 ```text
-User uploads file
-       │
-       ▼
-PapaParse reads file
-       │
-       ▼
-Validate each row:
-  - name required
-  - batch_year must be number
-  - phone format check (optional)
-       │
-       ▼
-Show preview with valid/invalid rows
-       │
-       ▼
-User clicks "Import"
-       │
-       ▼
-Batch insert to Supabase
-(chunks of 50 for performance)
-       │
-       ▼
-Show success/error summary
+┌──────────────────────────────────────────────┐
+│           Our Teachers                        │
+│    Meet our expert language instructors       │
+│                                               │
+│  ┌────────┐  ┌────────┐  ┌────────┐          │
+│  │ Photo  │  │ Photo  │  │ Photo  │          │
+│  │ Name   │  │ Name   │  │ Name   │          │
+│  │ Desig. │  │ Desig. │  │ Desig. │          │
+│  │ Bio    │  │ Bio    │  │ Bio    │          │
+│  └────────┘  └────────┘  └────────┘          │
+│                                               │
+│         [View All Teachers →]                 │
+└──────────────────────────────────────────────┘
 ```
 
-### Validation Rules
+### Teachers Page Layout
 
 ```text
-- name: Required, non-empty string
-- phone: Optional, allows digits, +, -, spaces
-- batch_year: Optional, must be valid year (1900-2100)
-- company: Optional string
-- position fields: Optional strings
-- story fields: Optional strings
+Hero Banner
+    │
+    ▼
+Grid of Teacher Cards (3 columns on desktop)
+    - Photo (Cloudinary)
+    - Name
+    - Designation (localized)
+    - Specialization (localized)
+    - Bio excerpt (localized)
 ```
 
-### Batch Insert Strategy
-
-```text
-- Split data into chunks of 50 rows
-- Insert each chunk sequentially
-- Track success/failure count
-- Show progress bar during import
-- Report final summary
-```
-
----
-
-## Package Addition
-
-```json
-{
-  "papaparse": "^5.4.1",
-  "@types/papaparse": "^5.3.14"
-}
-```
-
----
-
-## সময় অনুমান
-- Database migration: ২ মিনিট
-- BulkUploadAlumni component: ১৫ মিনিট
-- AlumniAdmin update: ১০ মিনিট
-- Testing & fixes: ৫ মিনিট
-
-**মোট: ~৩২ মিনিট**
+### Data Query Pattern
+Same pattern as Alumni:
+- Public pages: `is_active = true`, ordered by `sort_order`
+- Admin: full access, all records
+- Featured filter for About page section: `is_featured = true`
