@@ -1,142 +1,135 @@
-# Revised n8n API Plan: Public Data and Leads Separate
+# Revised API Plan: Full Information in Bangla
 
-ঠিক বলেছেন — lead/submission data আলাদা রাখা ভালো, কারণ এগুলো private/sensitive data. তাই API দুই ভাগে করা হবে।
+হ্যাঁ, আপনি full information পাবেন — এবং API response বাংলায় দেওয়া হবে।
 
-## What will be built
-
-### 1. Public website data API
-For normal website content:
+বর্তমান API প্ল্যানকে একটু পরিবর্তন করে দুইটা endpoint রাখা হবে:
 
 ```text
-GET /functions/v1/website-public-data
+GET /functions/v1/website-public-data?lang=bn&mode=full
+GET /functions/v1/website-leads-data?lang=bn&mode=full
 ```
 
-This will return public/non-sensitive website data only.
+## What you will get
 
-Included data:
-- Teachers
-- Courses
-- Books
-- Notices
-- Gallery
-- Videos
+### 1. Public website data API
+এই API থেকে website-এর public content full information সহ বাংলায় পাওয়া যাবে।
+
+Included:
+- শিক্ষক/Teachers
+- কোর্স/Courses
+- বই/Books
+- নোটিশ/Notices
+- গ্যালারি/Gallery
+- ভিডিও/Videos
 - Alumni
 - Services
 - Partners
 - Media
 - Testimonials
-- Navigation items
+- Navigation
 - Site settings
 - Hero settings
-
-Example response:
-
-```json
-{
-  "success": true,
-  "generated_at": "2026-04-27T00:00:00.000Z",
-  "data": {
-    "teachers": [],
-    "courses": [],
-    "books": [],
-    "notices": [],
-    "gallery": [],
-    "videos": [],
-    "alumni": [],
-    "services": [],
-    "partners": [],
-    "media": [],
-    "testimonials": [],
-    "navigation": [],
-    "site_settings": [],
-    "hero_settings": []
-  }
-}
-```
-
----
+- Jobs, if needed from existing website data
 
 ### 2. Leads/submissions API
-For sensitive lead data:
+এই API আলাদা থাকবে, কারণ এগুলো sensitive/private data।
 
-```text
-GET /functions/v1/website-leads-data
-```
-
-This will return only submission/lead data.
-
-Included data:
+Included:
 - Admission applications
-- Contact submissions
+- Contact form submissions
 - Newsletter subscribers
 
-Example response:
+## Bangla response format
+
+API response-এ Bengali-readable field names দেওয়া হবে, যেন n8n workflow-তে data বুঝতে সহজ হয়।
+
+Example:
 
 ```json
 {
   "success": true,
+  "language": "bn",
+  "mode": "full",
   "generated_at": "2026-04-27T00:00:00.000Z",
   "data": {
-    "admission_applications": [],
-    "contact_submissions": [],
-    "newsletter_subscribers": []
+    "courses": [
+      {
+        "আইডি": "...",
+        "শিরোনাম": "চাইনিজ ভাষা কোর্স",
+        "বিবরণ": "...",
+        "সময়কাল": "...",
+        "ফি": 5000,
+        "ছবি": "...",
+        "সক্রিয়": true
+      }
+    ],
+    "admission_applications": [
+      {
+        "পূর্ণ নাম": "...",
+        "ফোন": "...",
+        "ইমেইল": "...",
+        "ঠিকানা": "...",
+        "শিক্ষাগত যোগ্যতা": "...",
+        "আবেদনের তারিখ": "...",
+        "স্ট্যাটাস": "pending"
+      }
+    ]
   }
 }
 ```
 
----
+## Full information behavior
 
-## Security approach
+- `lang=bn` দিলে multilingual content-এর Bangla version return হবে।
+- `mode=full` দিলে প্রতিটি record-এর সব দরকারি field return হবে।
+- যেখানে Bangla translation নেই, সেখানে fallback হিসেবে English value দেওয়া হবে যাতে data blank না হয়।
+- Sensitive lead data public content API-এর সাথে mix হবে না।
 
-Both APIs will be protected by secret key, but keeping leads separate gives better control.
+## Security
 
-n8n will call the APIs with:
+দুইটা endpoint-ই secret key দিয়ে protected থাকবে। n8n HTTP Request node-এ header দিতে হবে:
 
 ```text
-x-api-key: YOUR_SECRET_KEY
+x-api-key: lb_n8n_api_2026_K7mQ9xR4vT2pL8zN5cW3yH6sD1aF0bJ
 ```
 
-Security rules:
-- Missing/wrong API key returns `401 Unauthorized`
-- Only `GET` and `OPTIONS` methods allowed
-- Lead data will never be mixed with public content API
-- Secret key will be stored securely in Lovable Cloud backend secrets
-- No API key will be exposed in frontend code
+Rules:
+- Wrong/missing key হলে `401 Unauthorized`
+- Only `GET` and `OPTIONS` allowed
+- API key frontend code-এ থাকবে না
+- Lead/submission data আলাদা endpoint-এ থাকবে
 
----
+## n8n setup
 
-## n8n workflow setup
+n8n-এ দুইটা HTTP Request node ব্যবহার করবেন:
 
-You can use two separate **HTTP Request** nodes in n8n:
-
-### Public data node
-```text
-Method: GET
-URL: https://fllbvdhwnwwiqkevnakg.supabase.co/functions/v1/website-public-data
-Header:
-  x-api-key: your-secret-api-key
-```
-
-### Leads data node
 ```text
 Method: GET
-URL: https://fllbvdhwnwwiqkevnakg.supabase.co/functions/v1/website-leads-data
-Header:
-  x-api-key: your-secret-api-key
+URL: [backend function URL]/website-public-data?lang=bn&mode=full
+Header: x-api-key = your secret key
 ```
 
----
+```text
+Method: GET
+URL: [backend function URL]/website-leads-data?lang=bn&mode=full
+Header: x-api-key = your secret key
+```
 
-## Files to create/update
+Implementation শেষে আমি আপনাকে exact callable URLs এবং n8n setup details দিয়ে দেব।
 
-| Action | File |
-|---|---|
-| Create | `supabase/functions/website-public-data/index.ts` |
-| Create | `supabase/functions/website-leads-data/index.ts` |
-| Optional update | `supabase/config.toml` only if function-specific config is required |
+## Technical implementation
 
----
+I will create two backend functions:
 
-## Implementation note
+1. `website-public-data`
+   - Reads public website tables
+   - Returns active/public content
+   - Maps multilingual columns like `title_bn`, `description_bn` into Bangla response fields
+   - Supports `lang=bn` and `mode=full`
 
-During implementation I’ll request one secure API key secret for n8n access. After that I’ll create and deploy both backend functions, then provide the final endpoint URLs and header details for your n8n workflow.
+2. `website-leads-data`
+   - Reads admission/contact/newsletter submissions using secure backend access
+   - Returns full lead information with Bangla labels
+   - Protected by the same secret key
+
+No database schema changes are required for this update.
