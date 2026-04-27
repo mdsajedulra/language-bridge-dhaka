@@ -1,139 +1,142 @@
+# Revised n8n API Plan: Public Data and Leads Separate
 
-# Our Teachers Feature
+ঠিক বলেছেন — lead/submission data আলাদা রাখা ভালো, কারণ এগুলো private/sensitive data. তাই API দুই ভাগে করা হবে।
 
-## সারসংক্ষেপ
-একটি সম্পূর্ণ "Our Teachers" feature তৈরি হবে যেখানে থাকবে:
-1. Database-এ নতুন `teachers` table
-2. একটি আলাদা Teachers page (`/teachers`)
-3. About page-এ "Our Teachers" section
-4. Admin panel-এ Teachers management page
+## What will be built
 
----
-
-## ধাপ ১: Database - `teachers` Table তৈরি
-
-| Column | Type | Required | Default |
-|--------|------|----------|---------|
-| id | uuid | Yes | auto |
-| name | text | Yes | - |
-| phone | text | No | - |
-| email | text | No | - |
-| photo_url | text | No | - |
-| designation_en | text | No | - |
-| designation_bn | text | No | - |
-| designation_zh | text | No | - |
-| bio_en | text | No | - |
-| bio_bn | text | No | - |
-| bio_zh | text | No | - |
-| specialization_en | text | No | - |
-| specialization_bn | text | No | - |
-| specialization_zh | text | No | - |
-| is_featured | boolean | No | false |
-| is_active | boolean | No | true |
-| sort_order | integer | No | 0 |
-| created_at | timestamptz | Yes | now() |
-
-RLS Policies:
-- Anyone can view active teachers (SELECT where is_active = true)
-- Admins can manage all (ALL with has_role check)
-
----
-
-## ধাপ ২: Teachers Admin Page
-
-নতুন ফাইল: `src/pages/admin/TeachersAdmin.tsx`
-
-AlumniAdmin এর মতো same pattern follow করবে:
-- Full CRUD (Create, Read, Update, Delete)
-- Cloudinary image upload for teacher photo
-- Multi-language fields (designation, bio, specialization)
-- Featured ও Active toggle
-- Sort order management
-
----
-
-## ধাপ ৩: Teachers Public Page
-
-নতুন ফাইল: `src/pages/Teachers.tsx`
-
-Route: `/teachers`
-
-Teachers দের profile cards দেখাবে:
-- Photo, Name, Designation
-- Specialization
-- Short bio
-- Featured teachers হাইলাইট হবে
-
----
-
-## ধাপ ৪: About Page-এ "Our Teachers" Section
-
-নতুন component: `src/components/about/TeachersSection.tsx`
-
-About page-এ Stats section এর পরে একটি "Our Teachers" section যোগ হবে:
-- Featured teachers দেখাবে (max 4-6)
-- "View All Teachers" button থাকবে `/teachers` page-এ যাওয়ার জন্য
-
----
-
-## ধাপ ৫: Routing ও Navigation Update
-
-- `App.tsx`-এ `/teachers` route যোগ
-- `App.tsx`-এ `/admin/teachers` route যোগ
-- `AdminLayout.tsx`-এ Teachers menu item যোগ
-
----
-
-## সম্পূর্ণ File List
-
-| Action | File Path |
-|--------|-----------|
-| Migration | `teachers` table তৈরি + RLS |
-| Create | `src/pages/admin/TeachersAdmin.tsx` |
-| Create | `src/pages/Teachers.tsx` |
-| Create | `src/components/about/TeachersSection.tsx` |
-| Update | `src/pages/About.tsx` (TeachersSection যোগ) |
-| Update | `src/App.tsx` (routes যোগ) |
-| Update | `src/components/admin/AdminLayout.tsx` (menu item যোগ) |
-
----
-
-## Technical Details
-
-### TeachersSection Component (About Page)
+### 1. Public website data API
+For normal website content:
 
 ```text
-┌──────────────────────────────────────────────┐
-│           Our Teachers                        │
-│    Meet our expert language instructors       │
-│                                               │
-│  ┌────────┐  ┌────────┐  ┌────────┐          │
-│  │ Photo  │  │ Photo  │  │ Photo  │          │
-│  │ Name   │  │ Name   │  │ Name   │          │
-│  │ Desig. │  │ Desig. │  │ Desig. │          │
-│  │ Bio    │  │ Bio    │  │ Bio    │          │
-│  └────────┘  └────────┘  └────────┘          │
-│                                               │
-│         [View All Teachers →]                 │
-└──────────────────────────────────────────────┘
+GET /functions/v1/website-public-data
 ```
 
-### Teachers Page Layout
+This will return public/non-sensitive website data only.
+
+Included data:
+- Teachers
+- Courses
+- Books
+- Notices
+- Gallery
+- Videos
+- Alumni
+- Services
+- Partners
+- Media
+- Testimonials
+- Navigation items
+- Site settings
+- Hero settings
+
+Example response:
+
+```json
+{
+  "success": true,
+  "generated_at": "2026-04-27T00:00:00.000Z",
+  "data": {
+    "teachers": [],
+    "courses": [],
+    "books": [],
+    "notices": [],
+    "gallery": [],
+    "videos": [],
+    "alumni": [],
+    "services": [],
+    "partners": [],
+    "media": [],
+    "testimonials": [],
+    "navigation": [],
+    "site_settings": [],
+    "hero_settings": []
+  }
+}
+```
+
+---
+
+### 2. Leads/submissions API
+For sensitive lead data:
 
 ```text
-Hero Banner
-    │
-    ▼
-Grid of Teacher Cards (3 columns on desktop)
-    - Photo (Cloudinary)
-    - Name
-    - Designation (localized)
-    - Specialization (localized)
-    - Bio excerpt (localized)
+GET /functions/v1/website-leads-data
 ```
 
-### Data Query Pattern
-Same pattern as Alumni:
-- Public pages: `is_active = true`, ordered by `sort_order`
-- Admin: full access, all records
-- Featured filter for About page section: `is_featured = true`
+This will return only submission/lead data.
+
+Included data:
+- Admission applications
+- Contact submissions
+- Newsletter subscribers
+
+Example response:
+
+```json
+{
+  "success": true,
+  "generated_at": "2026-04-27T00:00:00.000Z",
+  "data": {
+    "admission_applications": [],
+    "contact_submissions": [],
+    "newsletter_subscribers": []
+  }
+}
+```
+
+---
+
+## Security approach
+
+Both APIs will be protected by secret key, but keeping leads separate gives better control.
+
+n8n will call the APIs with:
+
+```text
+x-api-key: YOUR_SECRET_KEY
+```
+
+Security rules:
+- Missing/wrong API key returns `401 Unauthorized`
+- Only `GET` and `OPTIONS` methods allowed
+- Lead data will never be mixed with public content API
+- Secret key will be stored securely in Lovable Cloud backend secrets
+- No API key will be exposed in frontend code
+
+---
+
+## n8n workflow setup
+
+You can use two separate **HTTP Request** nodes in n8n:
+
+### Public data node
+```text
+Method: GET
+URL: https://fllbvdhwnwwiqkevnakg.supabase.co/functions/v1/website-public-data
+Header:
+  x-api-key: your-secret-api-key
+```
+
+### Leads data node
+```text
+Method: GET
+URL: https://fllbvdhwnwwiqkevnakg.supabase.co/functions/v1/website-leads-data
+Header:
+  x-api-key: your-secret-api-key
+```
+
+---
+
+## Files to create/update
+
+| Action | File |
+|---|---|
+| Create | `supabase/functions/website-public-data/index.ts` |
+| Create | `supabase/functions/website-leads-data/index.ts` |
+| Optional update | `supabase/config.toml` only if function-specific config is required |
+
+---
+
+## Implementation note
+
+During implementation I’ll request one secure API key secret for n8n access. After that I’ll create and deploy both backend functions, then provide the final endpoint URLs and header details for your n8n workflow.
