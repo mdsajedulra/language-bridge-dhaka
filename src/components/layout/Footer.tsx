@@ -104,6 +104,12 @@ const Footer = () => {
   const phone = siteSettings?.contact_phone?.value_en || t('footer.phone');
   const emailAddress = siteSettings?.contact_email?.value_en || t('footer.email');
   const logoUrl = siteSettings?.logo?.image_url;
+  const privacyLabel = siteSettings?.privacy_policy_title
+    ? getLocalizedField(siteSettings.privacy_policy_title, 'value')
+    : t('footer.privacyPolicy');
+  const termsLabel = siteSettings?.terms_service_title
+    ? getLocalizedField(siteSettings.terms_service_title, 'value')
+    : t('footer.termsOfService');
 
   return (
     <footer className="bg-[#1A1A1A] text-white">
@@ -202,9 +208,17 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
-        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+        <div className="container py-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-sm text-gray-400">
           <p>{t('footer.copyright')}</p>
-          <p>{t('footer.affiliatedWith')}</p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-5 text-center">
+            <Link to="/privacy-policy" className="hover:text-[#0A6B4E] transition-colors">
+              {privacyLabel}
+            </Link>
+            <Link to="/terms-of-service" className="hover:text-[#0A6B4E] transition-colors">
+              {termsLabel}
+            </Link>
+            <p>{t('footer.affiliatedWith')}</p>
+          </div>
         </div>
       </div>
     </footer>
