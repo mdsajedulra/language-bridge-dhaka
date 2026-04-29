@@ -237,6 +237,87 @@ const SettingsAdmin = () => {
             </CardContent>
           </Card>
 
+          {/* Legal Pages */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Legal Pages</CardTitle>
+              <CardDescription>Dynamic Privacy Policy and Terms of Service content shown from footer links</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-foreground">Privacy Policy Title</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>English</Label>
+                    <Input value={settings.privacy_policy_title?.value_en || ''} onChange={(e) => updateSetting('privacy_policy_title', 'value_en', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>বাংলা</Label>
+                    <Input value={settings.privacy_policy_title?.value_bn || ''} onChange={(e) => updateSetting('privacy_policy_title', 'value_bn', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>中文</Label>
+                    <Input value={settings.privacy_policy_title?.value_zh || ''} onChange={(e) => updateSetting('privacy_policy_title', 'value_zh', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-foreground">Privacy Policy Content</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>English</Label>
+                    <Textarea value={settings.privacy_policy_content?.value_en || ''} onChange={(e) => updateSetting('privacy_policy_content', 'value_en', e.target.value)} rows={10} />
+                  </div>
+                  <div>
+                    <Label>বাংলা</Label>
+                    <Textarea value={settings.privacy_policy_content?.value_bn || ''} onChange={(e) => updateSetting('privacy_policy_content', 'value_bn', e.target.value)} rows={10} />
+                  </div>
+                  <div>
+                    <Label>中文</Label>
+                    <Textarea value={settings.privacy_policy_content?.value_zh || ''} onChange={(e) => updateSetting('privacy_policy_content', 'value_zh', e.target.value)} rows={10} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-foreground">Terms of Service Title</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>English</Label>
+                    <Input value={settings.terms_service_title?.value_en || ''} onChange={(e) => updateSetting('terms_service_title', 'value_en', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>বাংলা</Label>
+                    <Input value={settings.terms_service_title?.value_bn || ''} onChange={(e) => updateSetting('terms_service_title', 'value_bn', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>中文</Label>
+                    <Input value={settings.terms_service_title?.value_zh || ''} onChange={(e) => updateSetting('terms_service_title', 'value_zh', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-foreground">Terms of Service Content</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>English</Label>
+                    <Textarea value={settings.terms_service_content?.value_en || ''} onChange={(e) => updateSetting('terms_service_content', 'value_en', e.target.value)} rows={10} />
+                  </div>
+                  <div>
+                    <Label>বাংলা</Label>
+                    <Textarea value={settings.terms_service_content?.value_bn || ''} onChange={(e) => updateSetting('terms_service_content', 'value_bn', e.target.value)} rows={10} />
+                  </div>
+                  <div>
+                    <Label>中文</Label>
+                    <Textarea value={settings.terms_service_content?.value_zh || ''} onChange={(e) => updateSetting('terms_service_content', 'value_zh', e.target.value)} rows={10} />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Contact Information */}
           <Card>
             <CardHeader>
