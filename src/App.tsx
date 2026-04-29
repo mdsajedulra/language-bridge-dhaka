@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import Books from "./pages/Books";
 import Teachers from "./pages/Teachers";
 import Auth from "./pages/Auth";
+import LegalPage from "./pages/LegalPage";
 import Dashboard from "./pages/admin/Dashboard";
 import CoursesAdmin from "./pages/admin/CoursesAdmin";
 import SettingsAdmin from "./pages/admin/SettingsAdmin";
@@ -66,6 +67,8 @@ const App = () => (
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/books" element={<Books />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/privacy-policy" element={<LegalPage type="privacy" />} />
+            <Route path="/terms-of-service" element={<LegalPage type="terms" />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<Dashboard />} />

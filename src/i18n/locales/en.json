@@ -155,6 +155,8 @@
     "address": "House 123, Road 45, Dhanmondi, Dhaka-1205, Bangladesh",
     "phone": "+880 1234-567890",
     "email": "info@yidaiyilu.edu.bd",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
     "copyright": "© 2024 Yidai Yilu Chinese Institute. All rights reserved.",
     "affiliatedWith": "Affiliated with Bangladesh Technical Education Board (No. 50803)"
   },
