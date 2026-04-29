@@ -1,135 +1,46 @@
-# Revised API Plan: Full Information in Bangla
+আমি Privacy Policy এবং Terms of Service পেজ বানাবো, এগুলো main menu-তে যোগ করবো না—শুধু footer-এর bottom area-তে সুন্দরভাবে বসানো হবে। পেজের content dynamic থাকবে, যাতে Admin থেকে English, Bangla, Chinese তিন ভাষায় পরিবর্তন করা যায়।
 
-হ্যাঁ, আপনি full information পাবেন — এবং API response বাংলায় দেওয়া হবে।
+Implementation Plan:
 
-বর্তমান API প্ল্যানকে একটু পরিবর্তন করে দুইটা endpoint রাখা হবে:
+1. Dynamic page content storage
+- Database-এ `site_settings` ব্যবহার করেই content রাখা হবে, কারণ এই table আগে থেকেই public read এবং admin manage support করে।
+- নতুন dynamic keys যোগ করা হবে:
+  - `privacy_policy_title`
+  - `privacy_policy_content`
+  - `terms_service_title`
+  - `terms_service_content`
+- প্রতিটি key-তে `value_en`, `value_bn`, `value_zh` থাকবে।
+- Bangla content website-এর current data/feature অনুযায়ী লেখা হবে: admission form, contact form, newsletter, course inquiry, alumni/teacher/course/public content, admin-managed website content, n8n/API integration context, Cloudinary media links ইত্যাদি বিবেচনায়।
 
-```text
-GET /functions/v1/website-public-data?lang=bn&mode=full
-GET /functions/v1/website-leads-data?lang=bn&mode=full
-```
+2. Public pages
+- নতুন public route তৈরি হবে:
+  - `/privacy-policy`
+  - `/terms-of-service`
+- একই reusable page component দিয়ে দুই পেজ render করা হবে।
+- Page content database থেকে current language অনুযায়ী দেখাবে।
+- যদি database content কোনো কারণে না আসে, তাহলে safe fallback Bangla/English/Chinese content দেখাবে।
+- Content paragraphs/sections সুন্দরভাবে readable layout-এ দেখানো হবে।
 
-## What you will get
+3. Footer placement
+- Footer-এর bottom bar-এ copyright/affiliation-এর পাশে বা নিচে responsive legal links যোগ করা হবে:
+  - Privacy Policy
+  - Terms of Service
+- Main menu/header navigation পরিবর্তন করা হবে না।
+- Mobile view-তে links neatly stacked/centered থাকবে, desktop view-তে inline থাকবে।
 
-### 1. Public website data API
-এই API থেকে website-এর public content full information সহ বাংলায় পাওয়া যাবে।
+4. Admin dynamic editing
+- Admin Settings page-এ নতুন section যোগ হবে: “Legal Pages”।
+- Admin এখান থেকে Privacy Policy এবং Terms of Service content তিন ভাষায় edit/save করতে পারবে।
+- Existing save flow ব্যবহার করা হবে, যাতে আলাদা admin page দরকার না হয়।
 
-Included:
-- শিক্ষক/Teachers
-- কোর্স/Courses
-- বই/Books
-- নোটিশ/Notices
-- গ্যালারি/Gallery
-- ভিডিও/Videos
-- Alumni
-- Services
-- Partners
-- Media
-- Testimonials
-- Navigation
-- Site settings
-- Hero settings
-- Jobs, if needed from existing website data
+5. Multilingual labels
+- Footer link labels এবং page defaults English, Bangla, Chinese তিন ভাষায় থাকবে।
+- User language preference অনুযায়ী page title/content বদলাবে।
 
-### 2. Leads/submissions API
-এই API আলাদা থাকবে, কারণ এগুলো sensitive/private data।
-
-Included:
-- Admission applications
-- Contact form submissions
-- Newsletter subscribers
-
-## Bangla response format
-
-API response-এ Bengali-readable field names দেওয়া হবে, যেন n8n workflow-তে data বুঝতে সহজ হয়।
-
-Example:
-
-```json
-{
-  "success": true,
-  "language": "bn",
-  "mode": "full",
-  "generated_at": "2026-04-27T00:00:00.000Z",
-  "data": {
-    "courses": [
-      {
-        "আইডি": "...",
-        "শিরোনাম": "চাইনিজ ভাষা কোর্স",
-        "বিবরণ": "...",
-        "সময়কাল": "...",
-        "ফি": 5000,
-        "ছবি": "...",
-        "সক্রিয়": true
-      }
-    ],
-    "admission_applications": [
-      {
-        "পূর্ণ নাম": "...",
-        "ফোন": "...",
-        "ইমেইল": "...",
-        "ঠিকানা": "...",
-        "শিক্ষাগত যোগ্যতা": "...",
-        "আবেদনের তারিখ": "...",
-        "স্ট্যাটাস": "pending"
-      }
-    ]
-  }
-}
-```
-
-## Full information behavior
-
-- `lang=bn` দিলে multilingual content-এর Bangla version return হবে।
-- `mode=full` দিলে প্রতিটি record-এর সব দরকারি field return হবে।
-- যেখানে Bangla translation নেই, সেখানে fallback হিসেবে English value দেওয়া হবে যাতে data blank না হয়।
-- Sensitive lead data public content API-এর সাথে mix হবে না।
-
-## Security
-
-দুইটা endpoint-ই secret key দিয়ে protected থাকবে। n8n HTTP Request node-এ header দিতে হবে:
-
-```text
-x-api-key: lb_n8n_api_2026_K7mQ9xR4vT2pL8zN5cW3yH6sD1aF0bJ
-```
-
-Rules:
-- Wrong/missing key হলে `401 Unauthorized`
-- Only `GET` and `OPTIONS` allowed
-- API key frontend code-এ থাকবে না
-- Lead/submission data আলাদা endpoint-এ থাকবে
-
-## n8n setup
-
-n8n-এ দুইটা HTTP Request node ব্যবহার করবেন:
-
-```text
-Method: GET
-URL: [backend function URL]/website-public-data?lang=bn&mode=full
-Header: x-api-key = your secret key
-```
-
-```text
-Method: GET
-URL: [backend function URL]/website-leads-data?lang=bn&mode=full
-Header: x-api-key = your secret key
-```
-
-Implementation শেষে আমি আপনাকে exact callable URLs এবং n8n setup details দিয়ে দেব।
-
-## Technical implementation
-
-I will create two backend functions:
-
-1. `website-public-data`
-   - Reads public website tables
-   - Returns active/public content
-   - Maps multilingual columns like `title_bn`, `description_bn` into Bangla response fields
-   - Supports `lang=bn` and `mode=full`
-
-2. `website-leads-data`
-   - Reads admission/contact/newsletter submissions using secure backend access
-   - Returns full lead information with Bangla labels
-   - Protected by the same secret key
-
-No database schema changes are required for this update.
+Technical Details:
+- Database migration দিয়ে `site_settings`-এ default legal content insert করা হবে using upsert, যাতে existing data থাকলে duplicate না হয়।
+- Existing RLS policy যথেষ্ট: public can read site settings, only admins can manage.
+- `src/App.tsx`-এ দুইটি route যোগ হবে।
+- `src/components/layout/Footer.tsx`-এ footer legal links যোগ হবে।
+- `src/pages/admin/SettingsAdmin.tsx`-এ Legal Pages editor section যোগ হবে।
+- Supabase auto-generated files (`client.ts`, `types.ts`) manually edit করা হবে না।
