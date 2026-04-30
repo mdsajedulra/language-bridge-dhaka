@@ -21,6 +21,7 @@ import {
   Newspaper,
   Languages,
   Navigation,
+  DatabaseBackup,
   Home,
   LogOut,
   Menu,
@@ -52,6 +53,7 @@ const menuItems = [
   { path: '/admin/translations', label: 'Translations', icon: Languages },
   { path: '/admin/contacts', label: 'Contact Messages', icon: Mail },
   { path: '/admin/applications', label: 'Applications', icon: GraduationCap },
+  { path: '/admin/backup-restore', label: 'Backup & Restore', icon: DatabaseBackup },
 ];
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
