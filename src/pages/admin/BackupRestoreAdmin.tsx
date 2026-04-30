@@ -247,4 +247,3 @@ const BackupRestoreAdmin = () => {
 };
 
 export default BackupRestoreAdmin;
-TS
