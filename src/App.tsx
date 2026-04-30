@@ -40,6 +40,7 @@ import MediaAdmin from "./pages/admin/MediaAdmin";
 import VideosAdmin from "./pages/admin/VideosAdmin";
 import TranslationsAdmin from "./pages/admin/TranslationsAdmin";
 import TeachersAdmin from "./pages/admin/TeachersAdmin";
+import BackupRestoreAdmin from "./pages/admin/BackupRestoreAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
             <Route path="/admin/contacts" element={<ContactsAdmin />} />
             <Route path="/admin/applications" element={<ApplicationsAdmin />} />
             <Route path="/admin/teachers" element={<TeachersAdmin />} />
+            <Route path="/admin/backup-restore" element={<BackupRestoreAdmin />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
